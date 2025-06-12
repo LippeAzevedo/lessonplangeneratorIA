@@ -7,20 +7,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"> <!-- Adicionado font-weight 800 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            /* Degradê de Azul Royal para Amarelo Gema */
             background: linear-gradient(135deg, #4169E1 0%, #FFD700 100%); 
             color: #1a202c; 
             min-height: 100vh;
-            -webkit-font-smoothing: antialiased; /* Melhora renderização da fonte */
+            -webkit-font-smoothing: antialiased; 
             -moz-osx-font-smoothing: grayscale;
         }
         .container {
-            max-width: 1000px; /* Aumentado um pouco mais */
+            max-width: 1000px; 
         }
         .modal {
             display: none; 
@@ -31,28 +30,26 @@
             width: 100%; 
             height: 100%; 
             overflow: auto; 
-            background-color: rgba(0,0,0,0.7); /* Backdrop mais escuro */
+            background-color: rgba(0,0,0,0.7); 
         }
         .modal-content {
-            /* Degradê pastel um pouco mais escuro para o modal */
             background: linear-gradient(135deg, #b0d8f0 0%, #ffecb3 100%); 
             margin: 6% auto; 
             padding: 36px; 
-            border: 1px solid #9bb7d0; /* Borda azul acinzentado um pouco mais escura */
+            border: 1px solid #9bb7d0; 
             width: 90%; 
             max-width: 600px; 
-            border-radius: 24px; /* Mais arredondado */
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2); /* Sombra mais suave */
+            border-radius: 24px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2); 
         }
-        .modal-content .form-label { /* Labels dentro do modal com cor escura para contraste */
-            color: #374151; /* Cinza escuro */
+        .modal-content .form-label { 
+            color: #374151; 
         }
-        .modal-content h3 { /* Título do modal com cor escura */
-            color: #1f2937; /* Azul bem escuro */
+        .modal-content h3 { 
+            color: #1f2937; 
         }
-
         .close-button {
-            color: #4a5568; /* Cinza escuro para contraste com fundo pastel */
+            color: #4a5568; 
             float: right;
             font-size: 30px;
             font-weight: bold;
@@ -69,9 +66,8 @@
         textarea::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; } 
         textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; } 
         textarea::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
         .form-input, .form-textarea, .form-select {
-            @apply w-full px-5 py-3.5 border border-gray-400 rounded-3xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm; /* rounded-3xl e ring roxo */
+            @apply w-full px-5 py-3.5 border border-gray-400 rounded-3xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm; 
             background-color: rgba(255, 255, 255, 0.9); 
             backdrop-filter: blur(10px); 
             color: #1a202c; 
@@ -86,19 +82,22 @@
             cursor: not-allowed;
             border-color: #d1d5db;
         }
-        .form-label { /* Labels fora do modal */
+        .form-label { 
             @apply block text-sm font-semibold text-gray-100 mb-2; 
         }
         .btn { 
-            @apply px-7 py-3.5 border border-transparent rounded-3xl shadow-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900; /* rounded-3xl e offset do ring */
-            transition: background-color 0.2s ease-in-out, transform 0.15s ease-in-out, box-shadow 0.2s ease-in-out;
+            @apply px-7 py-3.5 border border-transparent rounded-3xl shadow-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900; 
+            transition: background-color 0.2s ease-in-out, transform 0.15s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out;
         }
-        .btn:hover {
+        .btn:disabled {
+            @apply opacity-60 cursor-not-allowed;
+        }
+        .btn:hover:not(:disabled) {
             box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-            transform: translateY(-1px); /* Leve elevação no hover */
+            transform: translateY(-1px); 
         }
-        .btn:active {
-            transform: translateY(2px); /* Efeito de pressionar mais pronunciado */
+        .btn:active:not(:disabled) {
+            transform: translateY(2px); 
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         .btn-primary { 
@@ -113,25 +112,24 @@
         .btn-success {
             @apply text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500;
         }
-        .btn-ai { /* Botão especial para a IA */
+        .btn-ai { 
              @apply text-white bg-gradient-to-r from-blue-500 via-teal-500 to-green-400 focus:ring-teal-400;
         }
         .btn-add-stage { 
             @apply flex items-center justify-center gap-2.5 text-white bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 hover:from-pink-600 hover:via-purple-700 hover:to-indigo-700 focus:ring-pink-500;
         }
-
         .stage-card { 
-            @apply bg-white/75 backdrop-blur-lg p-6 rounded-[28px] shadow-xl mb-8 border border-white/30; /* rounded-[28px] para ser bem arredondado */
+            @apply bg-white/75 backdrop-blur-lg p-6 rounded-[28px] shadow-xl mb-8 border border-white/30; 
         }
         .section-container { 
-            @apply bg-white/50 backdrop-blur-2xl p-10 rounded-[32px] shadow-2xl mb-14 border border-white/20; /* rounded-[32px] e mais blur */
+            @apply bg-white/50 backdrop-blur-2xl p-10 rounded-[32px] shadow-2xl mb-14 border border-white/20; 
         }
         .section-title {
-             @apply text-4xl font-extrabold mb-10 text-white pb-5 border-b-2 border-white/25; /* Título maior, mais peso, branco e borda mais sutil */
+             @apply text-4xl font-extrabold mb-10 text-white pb-5 border-b-2 border-white/25; 
              text-shadow: 0 3px 6px rgba(0,0,0,0.25);
         }
         .subsection-title { 
-            @apply text-2xl font-bold text-gray-50 mb-6 mt-4 pb-3 border-b border-white/20; /* Aumentado e mais peso */
+            @apply text-2xl font-bold text-gray-50 mb-6 mt-4 pb-3 border-b border-white/20; 
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         header h1 {
@@ -147,6 +145,13 @@
          .grid > div:last-child {
             margin-bottom: 0;
         }
+        .fa-spin {
+            animation: fa-spin 1.5s infinite linear;
+        }
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="text-gray-800"> 
@@ -154,16 +159,15 @@
         <header class="mb-14 text-center"> 
             <img src="https://www.passaporteedu.com.br/images/logotipo_slogan.svg" alt="Passaporte Edu Logo" id="logoImage" class="mx-auto mb-7 h-32 sm:h-36" crossorigin="anonymous" onerror="this.alt='Passaporte Edu Logo could not be loaded'; this.style.display='none'; document.getElementById('logo-error-message').style.display='block';">
             <p id="logo-error-message" style="display:none;" class="text-red-200 text-sm bg-red-800/50 p-2 rounded-md">Logo could not be loaded from external URL.</p>
-            <h1 class="text-5xl sm:text-6xl font-extrabold">Lesson Plan Generator</h1> <!-- Aumentado peso da fonte -->
+            <h1 class="text-5xl sm:text-6xl font-extrabold">Lesson Plan Generator</h1>
         </header>
 
         <div id="message-area" class="mb-10"></div>
 
         <div class="section-container">
-            <h2 class="section-title">Lesson Details</h2>
+            <h2 class="section-title">Lesson Details & AI Input</h2>
             
-            <!-- Subseção: Informações Básicas -->
-            <h3 class="subsection-title">Basic Information</h3>
+            <h3 class="subsection-title">Essential Information</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 form-field-group"> 
                 <div>
                     <label for="teacher" class="form-label">Teacher:</label>
@@ -173,12 +177,11 @@
                     <label for="date" class="form-label">Date:</label>
                     <input type="date" id="date" class="form-input">
                 </div>
-            </div>
-
-            <!-- Subseção: Objetivos da Aula -->
-            <h3 class="subsection-title">Lesson Objectives & AI Input</h3>
-            <div class="grid grid-cols-1 gap-y-5 form-field-group">
-                 <div class="md:col-span-2"> 
+                 <div>
+                    <label for="lessonTopic" class="form-label">Lesson Topic (for AI):</label>
+                    <input type="text" id="lessonTopic" class="form-input" placeholder="e.g., Simple Present with He/She/It">
+                </div>
+                <div>
                     <label for="classType" class="form-label">Class Type:</label>
                     <select id="classType" class="form-select">
                         <option value="Presentation - Grammar">Presentation - Grammar</option>
@@ -192,14 +195,9 @@
                         <option value="Pedagogical Meeting">Pedagogical Meeting</option>
                     </select>
                 </div>
-                 <div class="md:col-span-2"> <!-- NOVO CAMPO -->
-                    <label for="lessonTopic" class="form-label">Lesson Topic (for AI):</label>
-                    <input type="text" id="lessonTopic" class="form-input" placeholder="e.g., Simple Present with He/She/It">
-                </div>
             </div>
 
-            <!-- Subseção: Detalhes da Turma -->
-            <h3 class="subsection-title">Course & Level Details</h3>
+            <h3 class="subsection-title">Class Details</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 form-field-group">
                 <div>
                     <label for="levelCourseType" class="form-label">Course Type:</label>
@@ -225,14 +223,22 @@
                         <!-- Options will be populated by JavaScript -->
                     </select>
                 </div>
+                <div>
+                    <label for="numStudents" class="form-label">Number of Students:</label>
+                    <input type="number" id="numStudents" class="form-input" min="0">
+                </div>
             </div>
             
-            <!-- Campos ocultos para manter a estrutura do PDF sem poluir a UI -->
-            <input type="hidden" id="lessonAim">
+            <h3 class="subsection-title">Additional Considerations</h3>
+             <div class="grid grid-cols-1 gap-y-5 form-field-group">
+                <div class="md:col-span-2">
+                    <label for="possibleProblems" class="form-label">Anticipated Problems & Solutions:</label>
+                    <textarea id="possibleProblems" rows="4" class="form-textarea"></textarea> 
+                </div>
+            </div>
             <input type="hidden" id="objective">
-            <input type="hidden" id="numStudents">
-            <input type="hidden" id="possibleProblems">
             <input type="hidden" id="class">
+            <input type="hidden" id="lessonAim">
         </div>
 
         <div class="section-container">
@@ -251,7 +257,7 @@
         <footer class="mt-16 flex flex-col items-center justify-center gap-2 text-center">
             <button id="generateWithAI" class="btn btn-ai mb-4 w-full max-w-xs text-base">
                 <i class="fas fa-magic-sparkles mr-2.5"></i>
-                Generate with AI
+                <span id="ai-button-text">Generate with AI</span>
             </button>
             <button id="saveLessonPlan" class="btn btn-success mb-3 w-full max-w-xs">Save Plan</button>
             <div class="flex flex-wrap justify-center gap-4">
@@ -263,7 +269,6 @@
         </footer>
     </div>
 
-    <!-- Modal Adicionar Etapa -->
     <div id="addStageModal" class="modal">
         <div class="modal-content">
             <span class="close-button" id="closeAddStageModal">&times;</span>
@@ -402,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
         bilingualBooks: ["Livro 1", "Livro 2", "Livro 3", "Livro 4", "Livro 5", "Livro 6", "Livro 7", "Livro 8", "Livro 9", "Livro 10", "Livro 11", "Livro 12"],
         interSpecificBooks: ["Book 1", "Book 2", "Cambridge"],
         espanholLevels: ["Espanhol A1-", "Espanhol A1", "Espanhol A1+", "Espanhol A2-", "Espanhol A2", "Espanhol A2+"],
-        coursesWithNA: ["BilingualComputing", "Inter"], 
+        coursesWithNA: ["BilingualComputing"], 
         coursesUsingBilingualBooks: ["Coding I", "Coding II", "Inteligência Financeira & Speeching", "Soft Skills, Carreira e Empreendedorismo"]
     };
 
@@ -418,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
             optionsToShow = levelOptionsConfig.bilingualBooks;
         } else if (selectedCourseType === "Inter") {
             optionsToShow = levelOptionsConfig.interSpecificBooks;
-        } else if (selectedCourseType === "Espanhol") {
+        } else if (selectedCourseType === "Espanhol") { 
             optionsToShow = levelOptionsConfig.espanholLevels;
         } else { // KDGT, Kids, PreTeens, Teens, YoungAdults, Regular
             optionsToShow = levelOptionsConfig.standardLevels;
@@ -449,10 +454,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function saveState() {
         appState.teacher = teacherInput.value;
         appState.classType = classTypeSelect.value;
-        appState.lessonTopic = lessonTopicInput.value;
+        appState.lessonTopic = lessonTopicInput.value; 
         appState.date = dateInput.value;
         appState.levelCourseType = levelCourseTypeSelect.value;
         appState.levelDetail = levelDetailSelect.disabled ? "N/A (Não Aplicável)" : levelDetailSelect.value;
+        appState.numStudents = numStudentsInput.value;
+        appState.possibleProblems = possibleProblemsInput.value;
+        
         try {
             localStorage.setItem('lessonPlanData', JSON.stringify(appState));
             displayMessage('Lesson plan saved successfully!');
@@ -470,10 +478,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 Object.assign(appState, parsedData); 
                 teacherInput.value = appState.teacher || '';
                 classTypeSelect.value = appState.classType || 'Presentation - Grammar';
-                lessonTopicInput.value = appState.lessonTopic || '';
+                lessonTopicInput.value = appState.lessonTopic || ''; 
                 dateInput.value = appState.date || '';
                 levelCourseTypeSelect.value = appState.levelCourseType || 'KDGT';
                 populateLevelDetailOptions(); 
+                numStudentsInput.value = appState.numStudents || '';
+                possibleProblemsInput.value = appState.possibleProblems || '';
                 appState.stages = Array.isArray(appState.stages) ? appState.stages : [];
                 renderStages();
                 displayMessage('Lesson plan loaded successfully!');
@@ -498,12 +508,16 @@ document.addEventListener('DOMContentLoaded', function() {
             appState.lessonTopic = ''; 
             appState.date = ''; 
             appState.levelCourseType = 'KDGT';
+            appState.numStudents = '';
+            appState.possibleProblems = '';
             appState.stages = [];
             
             teacherInput.value = '';
             classTypeSelect.value = 'Presentation - Grammar';
             lessonTopicInput.value = '';
             levelCourseTypeSelect.value = 'KDGT';
+            numStudentsInput.value = '';
+            possibleProblemsInput.value = '';
             populateLevelDetailOptions(); 
             setDefaultDate(); 
             renderStages();
@@ -663,11 +677,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // AI Generation Logic
     async function generatePlanWithAI() {
+        const aiButton = document.getElementById('generateWithAI');
+        const aiButtonText = document.getElementById('ai-button-text');
+        const originalButtonHtml = aiButton.innerHTML;
+
         const teacher = teacherInput.value;
         const classType = classTypeSelect.value;
         const lessonTopic = lessonTopicInput.value;
         const courseType = levelCourseTypeSelect.value;
         const levelDetail = levelDetailSelect.value;
+        const numStudents = numStudentsInput.value;
         const classLevel = `${courseType} - ${levelDetail}`;
 
         if (!lessonTopic) {
@@ -675,50 +694,97 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        displayMessage("Generating lesson plan with AI... This may take a moment.", "success");
-
-        const prompt = `
-            You are a pedagogical planning expert for English classes, focusing on the PPP (Presentation, Practice, Production) methodology, creating plans for the Passaporte Edu school.
-
-            Create a detailed lesson plan with the following specifications:
-            - Teacher: ${teacher || 'To be defined'}
-            - Class Type: ${classType}
-            - Main Lesson Topic: ${lessonTopic}
-            - Class Level: ${classLevel}
-            
-            The lesson plan should have a total duration of 150 minutes, including a 15-minute break.
-            Distribute the activities across the following stages, respecting the times and quantities:
-            - Warm Up: 1 activity, lasting 5 to 7 minutes.
-            - Presentation: 1 or 2 activities, with a total duration of up to 25 minutes.
-            - Practice: A minimum of 3 activities, lasting up to 15 minutes EACH.
-            - Production: A minimum of 2 activities, lasting up to 20 minutes EACH.
-            - Wrap Up: 1 activity, lasting 5 minutes.
-
-            For each stage, provide the "aim" (pedagogical objective of the stage, in English), "activity" (detailed description of the activity, in English), "focus" (main interaction, e.g., T-S, S-S, Group Work), and "material" (necessary materials, e.g., Board, Marker, Worksheet, Book page X).
-
-            Please return your response EXCLUSIVELY in JSON format, following this structure:
-            {
-              "warm_up": { "aim": "...", "activity": "...", "focus": "T-S", "material": "...", "timing": 7 },
-              "presentations": [ { "aim": "...", "activity": "...", "focus": "T-S", "material": "...", "timing": 15 } ],
-              "practices": [
-                { "aim": "...", "activity": "...", "focus": "S-S", "material": "...", "timing": 15 },
-                { "aim": "...", "activity": "...", "focus": "Individual", "material": "...", "timing": 15 },
-                { "aim": "...", "activity": "...", "focus": "Pair Work", "material": "...", "timing": 15 }
-              ],
-              "productions": [
-                { "aim": "...", "activity": "...", "focus": "Group Work", "material": "...", "timing": 20 },
-                { "aim": "...", "activity": "...", "focus": "Group Work", "material": "...", "timing": 20 }
-              ],
-              "wrap_up": { "aim": "...", "activity": "...", "focus": "T-S", "material": "...", "timing": 5 }
-            }
-        `;
-        
-        let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-        const payload = { contents: chatHistory };
-        const apiKey = ""; // Leave empty, will be handled by the environment
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
         try {
+            aiButton.disabled = true;
+            aiButtonText.innerHTML = 'Generating... <i class="fas fa-spinner fa-spin ml-2"></i>';
+            displayMessage("Generating lesson plan with AI... This may take a moment.", "success");
+
+            const courseAges = {
+                KDGT: "3 to 5 years old", Kids: "6 to 8 years old", PreTeens: "9 to 11 years old",
+                Teens: "12 to 14 years old", YoungAdults: "15 to 17 years old", Regular: "18+ years old",
+                Espanhol: "14+ years old", Inter: "any age", BilingualComputing: "any age", "Coding I": "any age",
+                "Coding II": "any age", "Inteligência Financeira & Speeching": "any age", "Soft Skills, Carreira e Empreendedorismo": "any age"
+            };
+            const ageGroup = courseAges[courseType] || "any age";
+
+            const isSpanish = courseType === 'Espanhol';
+            const promptTemplate = isSpanish ? `
+                Usted es un experto en planificación pedagógica para clases de español, enfocado en la metodología PPP (Presentación, Práctica, Producción), creando planes para la escuela Passaporte Edu.
+
+                Cree un plan de clase detallado con las siguientes especificaciones:
+                - Profesor: ${teacher || 'A definir'}
+                - Tipo de Clase: ${classType}
+                - Tema Principal de la Clase: ${lessonTopic}
+                - Nivel de la Clase: ${classLevel} (para alumnos de ${ageGroup})
+                - Número de Alumnos: ${numStudents || 'grupo pequeño'}
+
+                El plan de clase debe seguir esta secuencia y tiempos: Duración total de 150 minutos (incluyendo un recreo de 15 min).
+                - Calentamiento: 1 actividad (5-7 min).
+                - Presentación: 1 actividad (hasta 25 min).
+                - Práctica: 2 actividades (hasta 15 min CADA UNA).
+                - Producción: 1 actividad (hasta 20 min).
+                - Recreo: 15 min.
+                - Presentación o Práctica (usted decide cuál es más apropiado): 1 actividad (hasta 25 min). En el JSON, la clave para esto es "stage_after_break", y debe establecer su propiedad "name" en "Presentación" o "Práctica".
+                - Práctica: 1 actividad (hasta 15 min).
+                - Producción: 1 actividad (hasta 20 min).
+                - Cierre (Wrap Up): 1 actividad (5 min).
+                
+                Para cada etapa, proporcione el "aim" (objetivo pedagógico), "activity" (descripción de la actividad), "focus" (interacción principal, ej: P-A, A-A, Grupo) y "material".
+
+                Retorne su respuesta EXCLUSIVAMENTE en formato JSON, siguiendo esta estructura:
+                {
+                  "warm_up": { "aim": "...", "activity": "...", "focus": "P-A", "material": "...", "timing": 7 },
+                  "presentation_1": { "aim": "...", "activity": "...", "focus": "P-A", "material": "...", "timing": 25 },
+                  "practice_1": { "aim": "...", "activity": "...", "focus": "A-A", "material": "...", "timing": 15 },
+                  "practice_2": { "aim": "...", "activity": "...", "focus": "Individual", "material": "...", "timing": 15 },
+                  "production_1": { "aim": "...", "activity": "...", "focus": "Grupo", "material": "...", "timing": 20 },
+                  "stage_after_break": { "name": "Práctica", "aim": "...", "activity": "...", "focus": "P-A", "material": "...", "timing": 25 },
+                  "practice_3": { "aim": "...", "activity": "...", "focus": "Parejas", "material": "...", "timing": 15 },
+                  "production_2": { "aim": "...", "activity": "...", "focus": "Grupo", "material": "...", "timing": 20 },
+                  "wrap_up": { "aim": "...", "activity": "...", "focus": "P-A", "material": "...", "timing": 5 }
+                }
+            ` : `
+                You are a pedagogical planning expert for English classes, focusing on the PPP (Presentation, Practice, Production) methodology, creating plans for the Passaporte Edu school.
+
+                Create a detailed lesson plan with the following specifications:
+                - Teacher: ${teacher || 'To be defined'}
+                - Class Type: ${classType}
+                - Main Lesson Topic: ${lessonTopic}
+                - Class Level: ${classLevel} (for students aged ${ageGroup})
+                - Number of Students: ${numStudents || 'a small group'}
+
+                The lesson plan must follow this sequence and timings: Total class time is 150 minutes (including a 15-min break).
+                - Warm Up: 1 activity (5-7 min).
+                - Presentation: 1 activity (up to 25 min).
+                - Practice: 2 activities (up to 15 min EACH).
+                - Production: 1 activity (up to 20 min).
+                - Break: 15 min.
+                - Presentation or Practice (you decide which is more appropriate): 1 activity (up to 25 min). In the JSON response, use the key "stage_after_break" for this stage and set its "name" property to either "Presentation" or "Practice".
+                - Practice: 1 activity (up to 15 min).
+                - Production: 1 activity (up to 20 min).
+                - Wrap Up: 1 activity (5 min).
+                
+                For each stage, provide the "aim" (pedagogical objective), "activity" (detailed description), "focus" (main interaction, e.g., T-S, S-S, Group Work), and "material".
+
+                Return your response EXCLUSIVELY in JSON format, following this structure:
+                {
+                  "warm_up": { "aim": "...", "activity": "...", "focus": "T-S", "material": "...", "timing": 7 },
+                  "presentation_1": { "aim": "...", "activity": "...", "focus": "T-S", "material": "...", "timing": 25 },
+                  "practice_1": { "aim": "...", "activity": "...", "focus": "S-S", "material": "...", "timing": 15 },
+                  "practice_2": { "aim": "...", "activity": "...", "focus": "Individual", "material": "...", "timing": 15 },
+                  "production_1": { "aim": "...", "activity": "...", "focus": "Group Work", "material": "...", "timing": 20 },
+                  "stage_after_break": { "name": "Practice", "aim": "...", "activity": "...", "focus": "T-S", "material": "...", "timing": 25 },
+                  "practice_3": { "aim": "...", "activity": "...", "focus": "Pair Work", "material": "...", "timing": 15 },
+                  "production_2": { "aim": "...", "activity": "...", "focus": "Group Work", "material": "...", "timing": 20 },
+                  "wrap_up": { "aim": "...", "activity": "...", "focus": "T-S", "material": "...", "timing": 5 }
+                }
+            `;
+            
+            let chatHistory = [{ role: "user", parts: [{ text: promptTemplate }] }];
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Leave empty, will be handled by the environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -726,36 +792,66 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (!response.ok) {
-                throw new Error(`API request failed with status ${response.status}`);
+                const errorBody = await response.json();
+                throw new Error(`API request failed with status ${response.status}: ${JSON.stringify(errorBody)}`);
             }
 
             const result = await response.json();
             
             if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
                 const rawText = result.candidates[0].content.parts[0].text.replace(/```json\n?/, '').replace(/```$/, '');
-                const generatedPlan = JSON.parse(rawText);
+                let generatedPlan;
+                try {
+                    generatedPlan = JSON.parse(rawText);
+                } catch (e) {
+                    console.error("Failed to parse AI response JSON:", e);
+                    console.error("Raw text from API:", rawText);
+                    throw new Error("Could not understand the AI's response. It was not valid JSON.");
+                }
 
-                appState.stages = []; // Clear existing stages
+                appState.stages = []; 
+                const stageNames = isSpanish 
+                    ? { WARM_UP: "Calentamiento", PRESENTATION: "Presentación", PRACTICE: "Práctica", PRODUCTION: "Producción", BREAK: "Recreo", WRAP_UP: "Cierre" }
+                    : { WARM_UP: "Warm Up!", PRESENTATION: "Presentation", PRACTICE: "Practice", PRODUCTION: "Production", BREAK: "Break", WRAP_UP: "Wrap Up!" };
 
-                // Add generated stages
-                if(generatedPlan.warm_up) addStageToStateAndRender('Warm Up!', generatedPlan.warm_up.aim, generatedPlan.warm_up.activity, generatedPlan.warm_up.focus, generatedPlan.warm_up.material, generatedPlan.warm_up.timing);
-                if(generatedPlan.presentations) generatedPlan.presentations.forEach(p => addStageToStateAndRender('Presentation', p.aim, p.activity, p.focus, p.material, p.timing));
-                if(generatedPlan.practices) generatedPlan.practices.forEach(p => addStageToStateAndRender('Practice', p.aim, p.activity, p.focus, p.material, p.timing));
+                const addStageHelper = (stageName, stageData) => {
+                    if (stageData) {
+                        addStageToStateAndRender(stageName, stageData.aim, stageData.activity, stageData.focus, stageData.material, stageData.timing);
+                    }
+                };
+
+                addStageHelper(stageNames.WARM_UP, generatedPlan.warm_up);
+                addStageHelper(stageNames.PRESENTATION, generatedPlan.presentation_1);
+                addStageHelper(stageNames.PRACTICE, generatedPlan.practice_1);
+                addStageHelper(stageNames.PRACTICE, generatedPlan.practice_2);
+                addStageHelper(stageNames.PRODUCTION, generatedPlan.production_1);
+                addStageHelper(stageNames.BREAK, { aim: isSpanish ? 'Un momento para descansar' : 'A moment to rest', activity: isSpanish ? 'Recreo de 15 minutos' : '15-minute break', timing: 15 });
+                if(generatedPlan.stage_after_break) {
+                    const stageNameKey = (generatedPlan.stage_after_break.name || 'Practice').toUpperCase();
+                    const stageName = stageNames[stageNameKey] || generatedPlan.stage_after_break.name;
+                    addStageHelper(stageName, generatedPlan.stage_after_break);
+                }
+                addStageHelper(stageNames.PRACTICE, generatedPlan.practice_3);
+                addStageHelper(stageNames.PRODUCTION, generatedPlan.production_2);
+                addStageHelper(stageNames.WRAP_UP, generatedPlan.wrap_up);
                 
-                addStageToStateAndRender('Break', 'A moment for students to rest', 'Students have a 15-minute break.', '', '', 15);
-
-                if(generatedPlan.productions) generatedPlan.productions.forEach(p => addStageToStateAndRender('Production', p.aim, p.activity, p.focus, p.material, p.timing));
-                if(generatedPlan.wrap_up) addStageToStateAndRender('Wrap Up!', generatedPlan.wrap_up.aim, generatedPlan.wrap_up.activity, generatedPlan.wrap_up.focus, generatedPlan.wrap_up.material, generatedPlan.wrap_up.timing);
+                // Anticipated problems are now handled by the user
+                possibleProblemsInput.value = '';
+                appState.possibleProblems = '';
 
                 renderStages();
                 displayMessage("Lesson plan generated successfully!", 'success');
             } else {
-                throw new Error("Invalid or empty API response.");
+                throw new Error("Invalid or empty API response structure.");
             }
 
         } catch (error) {
             console.error("Error generating plan with AI:", error);
             displayMessage(`An error occurred while contacting the AI: ${error.message}. Please try again.`, 'error');
+        } finally {
+            // Restore the button in any case
+            aiButton.disabled = false;
+            aiButton.innerHTML = originalButtonHtml;
         }
     }
 
