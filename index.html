@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson Plan Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"> <!-- Adicionado font-weight 800 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Degradê de Azul Royal para Amarelo Gema */
+            background: linear-gradient(135deg, #4169E1 0%, #FFD700 100%); 
+            color: #1a202c; 
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased; /* Melhora renderização da fonte */
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .container {
+            max-width: 1000px; /* Aumentado um pouco mais */
+        }
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 100; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.7); /* Backdrop mais escuro */
+        }
+        .modal-content {
+            /* Degradê pastel um pouco mais escuro para o modal */
+            background: linear-gradient(135deg, #b0d8f0 0%, #ffecb3 100%); 
+            margin: 6% auto; 
+            padding: 36px; 
+            border: 1px solid #9bb7d0; /* Borda azul acinzentado um pouco mais escura */
+            width: 90%; 
+            max-width: 600px; 
+            border-radius: 24px; /* Mais arredondado */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2); /* Sombra mais suave */
+        }
+        .modal-content .form-label { /* Labels dentro do modal com cor escura para contraste */
+            color: #374151; /* Cinza escuro */
+        }
+        .modal-content h3 { /* Título do modal com cor escura */
+            color: #1f2937; /* Azul bem escuro */
+        }
+
+        .close-button {
+            color: #4a5568; /* Cinza escuro para contraste com fundo pastel */
+            float: right;
+            font-size: 30px;
+            font-weight: bold;
+            transition: color 0.2s ease-in-out, transform 0.2s ease;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #1f2937; 
+            transform: scale(1.15);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        textarea::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; } 
+        textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; } 
+        textarea::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .form-input, .form-textarea, .form-select {
+            @apply w-full px-5 py-3.5 border border-gray-400 rounded-3xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm; /* rounded-3xl e ring roxo */
+            background-color: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(10px); 
+            color: #1a202c; 
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+        .form-select:disabled {
+            background-color: rgba(229, 231, 235, 0.8); 
+            color: #6b7280; 
+            cursor: not-allowed;
+            border-color: #d1d5db;
+        }
+        .form-label { /* Labels fora do modal */
+            @apply block text-sm font-semibold text-gray-100 mb-2; 
+        }
+        .btn { 
+            @apply px-7 py-3.5 border border-transparent rounded-3xl shadow-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900; /* rounded-3xl e offset do ring */
+            transition: background-color 0.2s ease-in-out, transform 0.15s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .btn:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            transform: translateY(-1px); /* Leve elevação no hover */
+        }
+        .btn:active {
+            transform: translateY(2px); /* Efeito de pressionar mais pronunciado */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .btn-primary { 
+            @apply text-white bg-purple-600 hover:bg-purple-700 focus:ring-purple-500;
+        }
+        .btn-secondary { 
+            @apply text-gray-800 bg-gray-50 hover:bg-gray-100 border-gray-300 focus:ring-purple-500;
+        }
+        .btn-danger {
+            @apply text-white bg-red-600 hover:bg-red-700 focus:ring-red-500;
+        }
+        .btn-success {
+            @apply text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500;
+        }
+        .btn-ai { /* Botão especial para a IA */
+             @apply text-white bg-gradient-to-r from-blue-500 via-teal-500 to-green-400 focus:ring-teal-400;
+        }
+        .btn-add-stage { 
+            @apply flex items-center justify-center gap-2.5 text-white bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 hover:from-pink-600 hover:via-purple-700 hover:to-indigo-700 focus:ring-pink-500;
+        }
+
+        .stage-card { 
+            @apply bg-white/75 backdrop-blur-lg p-6 rounded-[28px] shadow-xl mb-8 border border-white/30; /* rounded-[28px] para ser bem arredondado */
+        }
+        .section-container { 
+            @apply bg-white/50 backdrop-blur-2xl p-10 rounded-[32px] shadow-2xl mb-14 border border-white/20; /* rounded-[32px] e mais blur */
+        }
+        .section-title {
+             @apply text-4xl font-extrabold mb-10 text-white pb-5 border-b-2 border-white/25; /* Título maior, mais peso, branco e borda mais sutil */
+             text-shadow: 0 3px 6px rgba(0,0,0,0.25);
+        }
+        .subsection-title { 
+            @apply text-2xl font-bold text-gray-50 mb-6 mt-4 pb-3 border-b border-white/20; /* Aumentado e mais peso */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        header h1 {
+            color: #ffffff; 
+            text-shadow: 0 3px 7px rgba(0,0,0,0.35);
+        }
+        .form-field-group > div {
+            margin-bottom: 1.75rem; 
+        }
+        .grid > div { 
+             margin-bottom: 1.25rem; 
+        }
+         .grid > div:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body class="text-gray-800"> 
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="mb-14 text-center"> 
+            <img src="https://www.passaporteedu.com.br/images/logotipo_slogan.svg" alt="Passaporte Edu Logo" id="logoImage" class="mx-auto mb-7 h-32 sm:h-36" crossorigin="anonymous" onerror="this.alt='Passaporte Edu Logo could not be loaded'; this.style.display='none'; document.getElementById('logo-error-message').style.display='block';">
+            <p id="logo-error-message" style="display:none;" class="text-red-200 text-sm bg-red-800/50 p-2 rounded-md">Logo could not be loaded from external URL.</p>
+            <h1 class="text-5xl sm:text-6xl font-extrabold">Lesson Plan Generator</h1> <!-- Aumentado peso da fonte -->
+        </header>
+
+        <div id="message-area" class="mb-10"></div>
+
+        <div class="section-container">
+            <h2 class="section-title">Lesson Details</h2>
+            
+            <!-- Subseção: Informações Básicas -->
+            <h3 class="subsection-title">Basic Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 form-field-group"> 
+                <div>
+                    <label for="teacher" class="form-label">Teacher:</label>
+                    <input type="text" id="teacher" class="form-input">
+                </div>
+                <div>
+                    <label for="date" class="form-label">Date:</label>
+                    <input type="date" id="date" class="form-input">
+                </div>
+            </div>
+
+            <!-- Subseção: Objetivos da Aula -->
+            <h3 class="subsection-title">Lesson Objectives & AI Input</h3>
+            <div class="grid grid-cols-1 gap-y-5 form-field-group">
+                 <div class="md:col-span-2"> 
+                    <label for="classType" class="form-label">Class Type:</label>
+                    <select id="classType" class="form-select">
+                        <option value="Presentation - Grammar">Presentation - Grammar</option>
+                        <option value="Presentation - Vocabulary">Presentation - Vocabulary</option>
+                        <option value="Presentation - Vocabulary/Grammar">Presentation - Vocabulary/Grammar</option>
+                        <option value="Consolidation">Consolidation</option>
+                        <option value="Skills">Skills</option>
+                        <option value="Review">Review</option>
+                        <option value="Written Test">Written Test</option>
+                        <option value="Oral Test">Oral Test</option>
+                        <option value="Pedagogical Meeting">Pedagogical Meeting</option>
+                    </select>
+                </div>
+                 <div class="md:col-span-2"> <!-- NOVO CAMPO -->
+                    <label for="lessonTopic" class="form-label">Lesson Topic (for AI):</label>
+                    <input type="text" id="lessonTopic" class="form-input" placeholder="e.g., Simple Present with He/She/It">
+                </div>
+            </div>
+
+            <!-- Subseção: Detalhes da Turma -->
+            <h3 class="subsection-title">Course & Level Details</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 form-field-group">
+                <div>
+                    <label for="levelCourseType" class="form-label">Course Type:</label>
+                    <select id="levelCourseType" class="form-select">
+                        <option value="KDGT">KDGT (Kindergarten)</option>
+                        <option value="Kids">Kids</option>
+                        <option value="PreTeens">PreTeens</option>
+                        <option value="Teens">Teens</option>
+                        <option value="YoungAdults">YoungAdults</option>
+                        <option value="Regular">Regular</option>
+                        <option value="BilingualComputing">BilingualComputing</option>
+                        <option value="Coding I">Coding I</option>
+                        <option value="Coding II">Coding II</option>
+                        <option value="Inteligência Financeira & Speeching">Inteligência Financeira & Speeching</option>
+                        <option value="Soft Skills, Carreira e Empreendedorismo">Soft Skills, Carreira e Empreendedorismo</option>
+                        <option value="Inter">Inter</option>
+                        <option value="Espanhol">Espanhol</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="levelDetail" class="form-label">Level/Book:</label>
+                    <select id="levelDetail" class="form-select">
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Campos ocultos para manter a estrutura do PDF sem poluir a UI -->
+            <input type="hidden" id="lessonAim">
+            <input type="hidden" id="objective">
+            <input type="hidden" id="numStudents">
+            <input type="hidden" id="possibleProblems">
+            <input type="hidden" id="class">
+        </div>
+
+        <div class="section-container">
+            <div class="flex justify-between items-center mb-7 border-b-2 border-white/30 pb-5"> 
+                <h2 class="text-2xl font-bold text-white">Lesson Stages</h2> 
+                <button id="openAddStageModal" class="btn btn-add-stage text-base"> 
+                    <i class="fas fa-layer-group mr-2.5"></i> 
+                    <span>Add New Stage</span>
+                </button>
+            </div>
+            <div id="stages-container">
+                <!-- As etapas da aula serão adicionadas dinamicamente aqui -->
+            </div>
+        </div>
+
+        <footer class="mt-16 flex flex-col items-center justify-center gap-2 text-center">
+            <button id="generateWithAI" class="btn btn-ai mb-4 w-full max-w-xs text-base">
+                <i class="fas fa-magic-sparkles mr-2.5"></i>
+                Generate with AI
+            </button>
+            <button id="saveLessonPlan" class="btn btn-success mb-3 w-full max-w-xs">Save Plan</button>
+            <div class="flex flex-wrap justify-center gap-4">
+                <button id="loadLessonPlan" class="btn btn-secondary">Load Plan</button>
+                <button id="clearLessonPlan" class="btn btn-danger">Clear Plan</button>
+                <button id="downloadPdf" class="btn btn-primary">Download as PDF</button>
+            </div>
+            <p class="text-sm text-gray-100 mt-10 opacity-90">Developed By: Philippe Azevedo from Passaporte Edu Maceió. Version 2.0</p> 
+        </footer>
+    </div>
+
+    <!-- Modal Adicionar Etapa -->
+    <div id="addStageModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeAddStageModal">&times;</span>
+            <h3 class="text-3xl font-bold mb-8">Add New Stage</h3>
+            <div class="form-field-group">
+                <div>
+                    <label for="stageType" class="form-label">Stage Type:</label>
+                    <select id="stageType" class="form-select mb-6"> 
+                        <option value="Warm Up!">Warm Up!</option>
+                        <option value="Presentation">Presentation</option>
+                        <option value="Practice">Practice</option>
+                        <option value="Production">Production</option>
+                        <option value="Break">Break</option>
+                        <option value="Wrap Up!">Wrap Up!</option>
+                        <option value="Homework">Homework</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="newStageName" class="form-label">Stage Name (if Custom):</label>
+                    <input type="text" id="newStageName" class="form-input mb-6" disabled>
+                </div>
+                <div>
+                    <label for="newStageAim" class="form-label">Aim:</label>
+                    <textarea id="newStageAim" rows="2" class="form-textarea mb-6"></textarea>
+                </div>
+                <div>
+                    <label for="newStageActivity" class="form-label">Activity/Procedure:</label>
+                    <textarea id="newStageActivity" rows="3" class="form-textarea mb-6"></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-6 mb-6"> 
+                    <div>
+                        <label for="newStageFocus" class="form-label">Focus (e.g., T-S, S-S):</label>
+                        <input type="text" id="newStageFocus" class="form-input">
+                    </div>
+                    <div>
+                        <label for="newStageMaterial" class="form-label">Material:</label>
+                        <input type="text" id="newStageMaterial" class="form-input">
+                    </div>
+                    <div>
+                        <label for="newStageTiming" class="form-label">Timing (min):</label>
+                        <input type="number" id="newStageTiming" class="form-input" min="0">
+                    </div>
+                </div>
+                <div id="productionTimeWarning" class="text-red-700 bg-red-100 border border-red-300 p-3 rounded-lg text-sm mb-7" style="display: none;">Production stage should not exceed 20 minutes.</div> 
+                <button id="confirmAddStage" class="btn btn-primary w-full text-lg">Add Stage</button> 
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messageArea = document.getElementById('message-area');
+
+    function displayMessage(message, type = 'success') {
+        if (!messageArea) {
+            console.error("Message area not found!");
+            return;
+        }
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        messageDiv.className = `p-4 rounded-2xl mb-6 text-base shadow-xl font-semibold ${type === 'success' ? 'bg-emerald-500/80 text-white border border-emerald-600' : 'bg-red-500/80 text-white border border-red-600'}`;
+        messageArea.innerHTML = ''; 
+        messageArea.appendChild(messageDiv);
+        setTimeout(() => {
+            if (messageArea.contains(messageDiv)) {
+                 messageArea.innerHTML = '';
+            }
+        }, 5000);
+    }
+
+    if (typeof jspdf === 'undefined' || typeof jspdf.jsPDF === 'undefined') {
+        console.error("jsPDF library is not loaded correctly!");
+        displayMessage("Error: The PDF generation library (jsPDF) failed to load. Please check your internet connection or try refreshing the page.", 'error');
+        const downloadBtn = document.getElementById('downloadPdf');
+        if (downloadBtn) {
+            downloadBtn.disabled = true;
+            downloadBtn.title = "PDF generation is unavailable.";
+            downloadBtn.classList.remove('btn-primary');
+            downloadBtn.classList.add('btn-secondary', 'opacity-50', 'cursor-not-allowed');
+        }
+        return; 
+    }
+    
+    const tempDocCheck = new jspdf.jsPDF();
+    if (typeof tempDocCheck.autoTable !== 'function') {
+        console.error("jsPDF-AutoTable plugin is not loaded correctly or not attached to jsPDF instances!");
+        displayMessage("Error: The PDF table generation plugin (jsPDF-AutoTable) failed to load. Tables might not be generated correctly.", 'error');
+    }
+
+    const { jsPDF } = jspdf; 
+
+    const appState = {
+        teacher: '',
+        classType: 'Presentation - Grammar', 
+        lessonTopic: '', 
+        lessonAim: '',
+        objective: '',
+        date: '',
+        class: '',
+        levelCourseType: 'KDGT', 
+        levelDetail: '', 
+        numStudents: '',
+        possibleProblems: '',
+        stages: []
+    };
+
+    const teacherInput = document.getElementById('teacher');
+    const classTypeSelect = document.getElementById('classType'); 
+    const lessonTopicInput = document.getElementById('lessonTopic'); 
+    const lessonAimInput = document.getElementById('lessonAim');
+    const objectiveInput = document.getElementById('objective');
+    const dateInput = document.getElementById('date');
+    const classInput = document.getElementById('class');
+    const levelCourseTypeSelect = document.getElementById('levelCourseType');
+    const levelDetailSelect = document.getElementById('levelDetail');
+    const numStudentsInput = document.getElementById('numStudents');
+    const possibleProblemsInput = document.getElementById('possibleProblems');
+    const stagesContainer = document.getElementById('stages-container');
+
+    const addStageModal = document.getElementById('addStageModal');
+    const openAddStageModalBtn = document.getElementById('openAddStageModal');
+    const closeAddStageModalBtn = document.getElementById('closeAddStageModal');
+    const stageTypeSelect = document.getElementById('stageType');
+    const newStageNameInput = document.getElementById('newStageName');
+    const newStageAimInput = document.getElementById('newStageAim');
+    const newStageActivityInput = document.getElementById('newStageActivity');
+    const newStageFocusInput = document.getElementById('newStageFocus');
+    const newStageMaterialInput = document.getElementById('newStageMaterial');
+    const newStageTimingInput = document.getElementById('newStageTiming');
+    const confirmAddStageBtn = document.getElementById('confirmAddStage');
+    const productionTimeWarning = document.getElementById('productionTimeWarning');
+
+    const levelOptionsConfig = {
+        standardLevels: ["A1-", "A1", "A1+", "A2-", "A2", "A2+"],
+        bilingualBooks: ["Livro 1", "Livro 2", "Livro 3", "Livro 4", "Livro 5", "Livro 6", "Livro 7", "Livro 8", "Livro 9", "Livro 10", "Livro 11", "Livro 12"],
+        interSpecificBooks: ["Book 1", "Book 2", "Cambridge"],
+        espanholLevels: ["Espanhol A1-", "Espanhol A1", "Espanhol A1+", "Espanhol A2-", "Espanhol A2", "Espanhol A2+"],
+        coursesWithNA: ["BilingualComputing", "Inter"], 
+        coursesUsingBilingualBooks: ["Coding I", "Coding II", "Inteligência Financeira & Speeching", "Soft Skills, Carreira e Empreendedorismo"]
+    };
+
+    function populateLevelDetailOptions() {
+        const selectedCourseType = levelCourseTypeSelect.value;
+        let optionsToShow = [];
+        let disableLevelDetail = false;
+
+        if (levelOptionsConfig.coursesWithNA.includes(selectedCourseType)) {
+            optionsToShow = ["N/A (Não Aplicável)"];
+            disableLevelDetail = true;
+        } else if (levelOptionsConfig.coursesUsingBilingualBooks.includes(selectedCourseType)) {
+            optionsToShow = levelOptionsConfig.bilingualBooks;
+        } else if (selectedCourseType === "Inter") {
+            optionsToShow = levelOptionsConfig.interSpecificBooks;
+        } else if (selectedCourseType === "Espanhol") {
+            optionsToShow = levelOptionsConfig.espanholLevels;
+        } else { // KDGT, Kids, PreTeens, Teens, YoungAdults, Regular
+            optionsToShow = levelOptionsConfig.standardLevels;
+        }
+
+        levelDetailSelect.innerHTML = ''; 
+        optionsToShow.forEach(optionText => {
+            const option = document.createElement('option');
+            option.value = optionText;
+            option.textContent = optionText;
+            levelDetailSelect.appendChild(option);
+        });
+
+        levelDetailSelect.disabled = disableLevelDetail;
+
+        if (appState.levelDetail && optionsToShow.includes(appState.levelDetail)) {
+            levelDetailSelect.value = appState.levelDetail;
+        } else if (optionsToShow.length > 0) {
+            levelDetailSelect.value = optionsToShow[0]; 
+            appState.levelDetail = optionsToShow[0]; 
+        } else {
+            appState.levelDetail = ''; 
+        }
+    }
+
+    levelCourseTypeSelect.addEventListener('change', populateLevelDetailOptions);
+    
+    function saveState() {
+        appState.teacher = teacherInput.value;
+        appState.classType = classTypeSelect.value;
+        appState.lessonTopic = lessonTopicInput.value;
+        appState.date = dateInput.value;
+        appState.levelCourseType = levelCourseTypeSelect.value;
+        appState.levelDetail = levelDetailSelect.disabled ? "N/A (Não Aplicável)" : levelDetailSelect.value;
+        try {
+            localStorage.setItem('lessonPlanData', JSON.stringify(appState));
+            displayMessage('Lesson plan saved successfully!');
+        } catch (e) {
+            console.error("Error saving to localStorage:", e);
+            displayMessage('Failed to save lesson plan. Local storage might be full or disabled.', 'error');
+        }
+    }
+
+    function loadState() {
+        try {
+            const savedData = localStorage.getItem('lessonPlanData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                Object.assign(appState, parsedData); 
+                teacherInput.value = appState.teacher || '';
+                classTypeSelect.value = appState.classType || 'Presentation - Grammar';
+                lessonTopicInput.value = appState.lessonTopic || '';
+                dateInput.value = appState.date || '';
+                levelCourseTypeSelect.value = appState.levelCourseType || 'KDGT';
+                populateLevelDetailOptions(); 
+                appState.stages = Array.isArray(appState.stages) ? appState.stages : [];
+                renderStages();
+                displayMessage('Lesson plan loaded successfully!');
+            } else {
+                populateLevelDetailOptions(); 
+                renderStages(); 
+            }
+        } catch (e) {
+            console.error("Error loading from localStorage:", e);
+            displayMessage('Failed to load lesson plan. Saved data might be corrupted.', 'error');
+            appState.stages = []; 
+            populateLevelDetailOptions();
+            renderStages();
+        }
+    }
+    
+    function clearState() {
+        showConfirmationModal('Are you sure you want to clear the entire lesson plan? This cannot be undone.', () => {
+            localStorage.removeItem('lessonPlanData');
+            appState.teacher = '';
+            appState.classType = 'Presentation - Grammar';
+            appState.lessonTopic = ''; 
+            appState.date = ''; 
+            appState.levelCourseType = 'KDGT';
+            appState.stages = [];
+            
+            teacherInput.value = '';
+            classTypeSelect.value = 'Presentation - Grammar';
+            lessonTopicInput.value = '';
+            levelCourseTypeSelect.value = 'KDGT';
+            populateLevelDetailOptions(); 
+            setDefaultDate(); 
+            renderStages();
+            displayMessage('Lesson plan cleared.');
+        });
+    }
+
+    function renderStages() {
+        stagesContainer.innerHTML = ''; 
+        if (!appState.stages || appState.stages.length === 0) {
+            stagesContainer.innerHTML = '<p class="text-gray-200 text-center py-4 opacity-80">No stages added yet. Click "Generate with AI" or "+ Add New Stage" to begin.</p>';
+            return;
+        }
+        appState.stages.forEach((stage) => {
+            const stageDiv = document.createElement('div');
+            stageDiv.className = 'stage-card';
+            const stageName = stage.name || 'Unnamed Stage';
+            const stageAim = stage.aim || '';
+            const stageActivity = stage.activity || '';
+            const stageFocus = stage.focus || '';
+            const stageMaterial = stage.material || '';
+            const stageTiming = stage.timing || '0';
+            const stageId = stage.id || crypto.randomUUID(); 
+            stageDiv.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-xl font-semibold text-indigo-600">${stageName}</h4>
+                    <button class="btn btn-danger btn-sm py-1.5 px-3.5 text-xs remove-stage" data-id="${stageId}">Remove</button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 text-sm">
+                    <div><strong class="font-medium text-gray-700">Aim:</strong> <textarea data-id="${stageId}" data-field="aim" class="form-textarea text-sm p-3 mt-1.5 h-28 stage-input">${stageAim}</textarea></div>
+                    <div><strong class="font-medium text-gray-700">Activity/Procedure:</strong> <textarea data-id="${stageId}" data-field="activity" class="form-textarea text-sm p-3 mt-1.5 h-28 stage-input">${stageActivity}</textarea></div>
+                    <div><strong class="font-medium text-gray-700">Focus:</strong> <input type="text" value="${stageFocus}" data-id="${stageId}" data-field="focus" class="form-input text-sm p-3 mt-1.5 stage-input"></div>
+                    <div><strong class="font-medium text-gray-700">Material:</strong> <input type="text" value="${stageMaterial}" data-id="${stageId}" data-field="material" class="form-input text-sm p-3 mt-1.5 stage-input"></div>
+                    <div class="${stageName === 'Production' && parseInt(stageTiming) > 20 ? 'text-red-500 font-bold' : ''}">
+                        <strong class="font-medium text-gray-700">Timing (min):</strong> 
+                        <input type="number" value="${stageTiming}" data-id="${stageId}" data-field="timing" class="form-input text-sm p-3 mt-1.5 stage-input" min="0">
+                        ${stageName === 'Production' && parseInt(stageTiming) > 20 ? '<span class="text-xs block mt-2">Max 20 min!</span>' : ''}
+                    </div>
+                </div>
+            `;
+            stagesContainer.appendChild(stageDiv);
+        });
+    }
+
+    function handleStageInputChange(event) {
+        if (event.target.classList.contains('stage-input')) {
+            const stageId = event.target.dataset.id;
+            const field = event.target.dataset.field;
+            const value = event.target.value;
+            const stageIndex = appState.stages.findIndex(s => s.id === stageId);
+            if (stageIndex > -1) {
+                appState.stages[stageIndex][field] = value;
+                if (appState.stages[stageIndex].name === 'Production' && field === 'timing') {
+                    if (parseInt(value) > 20) {
+                        displayMessage('Production stage timing should not exceed 20 minutes.', 'error');
+                    }
+                    renderStages(); 
+                }
+            }
+        }
+    }
+    stagesContainer.addEventListener('input', handleStageInputChange);
+
+    stagesContainer.addEventListener('click', (event) => {
+        if (event.target.classList.contains('remove-stage')) {
+            const stageId = event.target.dataset.id;
+            showConfirmationModal('Are you sure you want to remove this stage?', () => {
+                appState.stages = appState.stages.filter(s => s.id !== stageId);
+                renderStages();
+            });
+        }
+    });
+
+    openAddStageModalBtn.onclick = () => {
+        addStageModal.style.display = "block";
+        stageTypeSelect.value = "Warm Up!";
+        newStageNameInput.value = "Warm Up!"; 
+        newStageNameInput.disabled = true;
+        newStageAimInput.value = "";
+        newStageActivityInput.value = "";
+        newStageFocusInput.value = "";
+        newStageMaterialInput.value = "";
+        newStageTimingInput.value = getDefaultTiming("Warm Up!");
+        productionTimeWarning.style.display = "none";
+    }
+    closeAddStageModalBtn.onclick = () => addStageModal.style.display = "none";
+    window.onclick = (event) => { 
+        if (event.target == addStageModal) {
+            addStageModal.style.display = "none";
+        }
+    }
+
+    function getDefaultTiming(stageName) {
+        switch(stageName) {
+            case 'Warm Up!': return 7;
+            case 'Practice': return 15;
+            case 'Production': return 20; 
+            default: return 10; 
+        }
+    }
+
+    stageTypeSelect.addEventListener('change', () => {
+        const selectedType = stageTypeSelect.value;
+        if (selectedType === 'Custom') {
+            newStageNameInput.disabled = false;
+            newStageNameInput.value = "";
+            newStageNameInput.focus();
+            newStageTimingInput.value = getDefaultTiming(selectedType); 
+        } else {
+            newStageNameInput.disabled = true;
+            newStageNameInput.value = selectedType; 
+            newStageTimingInput.value = getDefaultTiming(selectedType);
+        }
+        checkProductionTimingModal();
+    });
+    newStageTimingInput.addEventListener('input', checkProductionTimingModal);
+    newStageNameInput.addEventListener('input', checkProductionTimingModal); 
+
+    function checkProductionTimingModal() {
+        const stageName = (stageTypeSelect.value === 'Custom') ? newStageNameInput.value.trim() : stageTypeSelect.value;
+        if (stageName === 'Production' && parseInt(newStageTimingInput.value) > 20) {
+            productionTimeWarning.style.display = 'block';
+        } else {
+            productionTimeWarning.style.display = 'none';
+        }
+    }
+
+    confirmAddStageBtn.onclick = () => {
+        const type = stageTypeSelect.value;
+        const name = (type === 'Custom') ? newStageNameInput.value.trim() : type;
+        const aim = newStageAimInput.value.trim();
+        const activity = newStageActivityInput.value.trim();
+        const focus = newStageFocusInput.value.trim();
+        const material = newStageMaterialInput.value.trim();
+        const timing = newStageTimingInput.value.trim();
+        if (!name) {
+            displayMessage('Stage name is required for Custom type.', 'error'); return;
+        }
+        if (!timing || isNaN(parseInt(timing)) || parseInt(timing) < 0) {
+            displayMessage('Valid timing (a positive number) is required.', 'error'); return;
+        }
+        if (name === 'Production' && parseInt(timing) > 20) {
+            showConfirmationModal('Production stage timing exceeds 20 minutes. Do you want to proceed?', () => {
+                addStageToStateAndRender(name, aim, activity, focus, material, timing);
+            });
+        } else {
+            addStageToStateAndRender(name, aim, activity, focus, material, timing);
+        }
+    };
+
+    function addStageToStateAndRender(name, aim, activity, focus, material, timing) {
+        appState.stages.push({ id: crypto.randomUUID(), name, aim, activity, focus, material, timing });
+        renderStages();
+        addStageModal.style.display = "none";
+        displayMessage(`Stage "${name}" added.`);
+    }
+    
+    // AI Generation Logic
+    async function generatePlanWithAI() {
+        const teacher = teacherInput.value;
+        const classType = classTypeSelect.value;
+        const lessonTopic = lessonTopicInput.value;
+        const courseType = levelCourseTypeSelect.value;
+        const levelDetail = levelDetailSelect.value;
+        const classLevel = `${courseType} - ${levelDetail}`;
+
+        if (!lessonTopic) {
+            displayMessage("Please provide a 'Lesson Topic' for the AI to generate the plan.", "error");
+            return;
+        }
+
+        displayMessage("Generating lesson plan with AI... This may take a moment.", "success");
+
+        const prompt = `
+            You are a pedagogical planning expert for English classes, focusing on the PPP (Presentation, Practice, Production) methodology, creating plans for the Passaporte Edu school.
+
+            Create a detailed lesson plan with the following specifications:
+            - Teacher: ${teacher || 'To be defined'}
+            - Class Type: ${classType}
+            - Main Lesson Topic: ${lessonTopic}
+            - Class Level: ${classLevel}
+            
+            The lesson plan should have a total duration of 150 minutes, including a 15-minute break.
+            Distribute the activities across the following stages, respecting the times and quantities:
+            - Warm Up: 1 activity, lasting 5 to 7 minutes.
+            - Presentation: 1 or 2 activities, with a total duration of up to 25 minutes.
+            - Practice: A minimum of 3 activities, lasting up to 15 minutes EACH.
+            - Production: A minimum of 2 activities, lasting up to 20 minutes EACH.
+            - Wrap Up: 1 activity, lasting 5 minutes.
+
+            For each stage, provide the "aim" (pedagogical objective of the stage, in English), "activity" (detailed description of the activity, in English), "focus" (main interaction, e.g., T-S, S-S, Group Work), and "material" (necessary materials, e.g., Board, Marker, Worksheet, Book page X).
+
+            Please return your response EXCLUSIVELY in JSON format, following this structure:
+            {
+              "warm_up": { "aim": "...", "activity": "...", "focus": "T-S", "material": "...", "timing": 7 },
+              "presentations": [ { "aim": "...", "activity": "...", "focus": "T-S", "material": "...", "timing": 15 } ],
+              "practices": [
+                { "aim": "...", "activity": "...", "focus": "S-S", "material": "...", "timing": 15 },
+                { "aim": "...", "activity": "...", "focus": "Individual", "material": "...", "timing": 15 },
+                { "aim": "...", "activity": "...", "focus": "Pair Work", "material": "...", "timing": 15 }
+              ],
+              "productions": [
+                { "aim": "...", "activity": "...", "focus": "Group Work", "material": "...", "timing": 20 },
+                { "aim": "...", "activity": "...", "focus": "Group Work", "material": "...", "timing": 20 }
+              ],
+              "wrap_up": { "aim": "...", "activity": "...", "focus": "T-S", "material": "...", "timing": 5 }
+            }
+        `;
+        
+        let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+        const payload = { contents: chatHistory };
+        const apiKey = ""; // Leave empty, will be handled by the environment
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`API request failed with status ${response.status}`);
+            }
+
+            const result = await response.json();
+            
+            if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                const rawText = result.candidates[0].content.parts[0].text.replace(/```json\n?/, '').replace(/```$/, '');
+                const generatedPlan = JSON.parse(rawText);
+
+                appState.stages = []; // Clear existing stages
+
+                // Add generated stages
+                if(generatedPlan.warm_up) addStageToStateAndRender('Warm Up!', generatedPlan.warm_up.aim, generatedPlan.warm_up.activity, generatedPlan.warm_up.focus, generatedPlan.warm_up.material, generatedPlan.warm_up.timing);
+                if(generatedPlan.presentations) generatedPlan.presentations.forEach(p => addStageToStateAndRender('Presentation', p.aim, p.activity, p.focus, p.material, p.timing));
+                if(generatedPlan.practices) generatedPlan.practices.forEach(p => addStageToStateAndRender('Practice', p.aim, p.activity, p.focus, p.material, p.timing));
+                
+                addStageToStateAndRender('Break', 'A moment for students to rest', 'Students have a 15-minute break.', '', '', 15);
+
+                if(generatedPlan.productions) generatedPlan.productions.forEach(p => addStageToStateAndRender('Production', p.aim, p.activity, p.focus, p.material, p.timing));
+                if(generatedPlan.wrap_up) addStageToStateAndRender('Wrap Up!', generatedPlan.wrap_up.aim, generatedPlan.wrap_up.activity, generatedPlan.wrap_up.focus, generatedPlan.wrap_up.material, generatedPlan.wrap_up.timing);
+
+                renderStages();
+                displayMessage("Lesson plan generated successfully!", 'success');
+            } else {
+                throw new Error("Invalid or empty API response.");
+            }
+
+        } catch (error) {
+            console.error("Error generating plan with AI:", error);
+            displayMessage(`An error occurred while contacting the AI: ${error.message}. Please try again.`, 'error');
+        }
+    }
+
+    function imageToPNGDataURL(imgElement, callback, errorCallback) {
+        const attemptConversion = (imageToConvert) => { 
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = imageToConvert.naturalWidth || imageToConvert.width || 300; 
+                canvas.height = imageToConvert.naturalHeight || imageToConvert.height || 150;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    if (errorCallback) errorCallback(new Error("Canvas 2D context not available"));
+                    return;
+                }
+                ctx.fillStyle = "#FFFFFF"; 
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(imageToConvert, 0, 0, canvas.width, canvas.height);
+                const dataURL = canvas.toDataURL('image/png');
+                callback(dataURL);
+            } catch (e) {
+                console.error("Canvas conversion error:", e);
+                if (errorCallback) errorCallback(e);
+            }
+        };
+
+        if (imgElement.complete && (imgElement.naturalWidth !== 0 || imgElement.tagName !== 'IMG')) {
+            attemptConversion(imgElement);
+        } else if (imgElement.tagName === 'IMG' && imgElement.src) {
+            const tempImage = new Image();
+            tempImage.crossOrigin = imgElement.crossOrigin || "anonymous"; 
+            tempImage.onload = () => { 
+                attemptConversion(tempImage); 
+            };
+            tempImage.onerror = function() {
+                console.error("Error loading image for canvas conversion:", imgElement.src);
+                if (errorCallback) errorCallback(new Error("Image load error for canvas conversion"));
+            };
+            tempImage.src = imgElement.src;
+        } else {
+            console.warn("Image element might not be fully loaded or is not an IMG tag with src. Attempting direct conversion (might fail).");
+             if (imgElement.width && imgElement.height) { 
+                attemptConversion(imgElement);
+            } else if (errorCallback) {
+                errorCallback(new Error("Image not ready for conversion and dimensions unknown."));
+            }
+        }
+    }
+
+    async function generatePdf() {
+        if (typeof jsPDF === 'undefined') { 
+             displayMessage('PDF generation library not loaded. Cannot generate PDF.', 'error');
+             return;
+        }
+        const doc = new jsPDF({ orientation: 'landscape' }); 
+        if (typeof doc.autoTable !== 'function') {
+            displayMessage('PDF table generation plugin (autoTable) not available. Tables may not be generated.', 'warning');
+        }
+
+        displayMessage('Generating PDF... Please wait.', 'success');
+        saveState(); 
+
+        const royalBlue = [65, 105, 225]; 
+        const darkRoyalBlue = [25, 25, 112]; 
+
+        let yPos = 15; 
+        const logoImgElement = document.getElementById('logoImage');
+        
+        if (logoImgElement && logoImgElement.src && logoImgElement.src !== window.location.href ) {
+            if (logoImgElement.style.display !== 'none') {
+                try {
+                    const dataUrl = await new Promise((resolve, reject) => {
+                        imageToPNGDataURL(logoImgElement, data => resolve(data), err => reject(err));
+                    });
+                    
+                    const tempImgForDim = new Image();
+                    await new Promise((resolve, reject) => {
+                        tempImgForDim.onload = resolve;
+                        tempImgForDim.onerror = () => reject(new Error("Failed to load dataUrl into temp image for dimensions."));
+                        tempImgForDim.src = dataUrl;
+                    });
+
+                    const logoWidth = 40; 
+                    const aspectRatio = tempImgForDim.height / tempImgForDim.width;
+                    const logoHeight = logoWidth * aspectRatio || 20; 
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const logoX = (pageWidth - logoWidth) / 2;
+                    doc.addImage(dataUrl, 'PNG', logoX, yPos, logoWidth, logoHeight); 
+                    yPos += logoHeight + 8; 
+                } catch (e) {
+                     console.error("Error processing logo for PDF:", e.message || e);
+                     displayMessage('Failed to add logo to PDF: ' + (e.message || 'Unknown error'), 'error');
+                }
+            } else {
+                 console.warn("Logo image element is hidden due to loading error, not adding to PDF.");
+            }
+        } else {
+            console.warn("Logo image not found, not loaded, or src is invalid for PDF.");
+        }
+        
+        doc.setFontSize(22); 
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(royalBlue[0], royalBlue[1], royalBlue[2]);
+        doc.text("LESSON PLAN", doc.internal.pageSize.getWidth() / 2, yPos, { align: 'center' });
+        yPos += 14; 
+        doc.setTextColor(0, 0, 0); 
+
+        doc.setFontSize(12); 
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(royalBlue[0], royalBlue[1], royalBlue[2]); 
+
+        let levelForPdf = appState.levelCourseType;
+        if (appState.levelDetail && appState.levelDetail !== "N/A (Não Aplicável)") {
+            levelForPdf += ` - ${appState.levelDetail}`;
+        }
+
+        const details = [
+            { label: "Teacher", value: appState.teacher },
+            { label: "Class Type", value: appState.classType },
+            { label: "Lesson's Aim", value: lessonAimInput.value || appState.lessonAim },
+            { label: "Objective", value: objectiveInput.value || appState.objective },
+            { label: "Date", value: appState.date },
+            { label: "Class", value: classInput.value || appState.class},
+            { label: "Level", value: levelForPdf }, 
+            { label: "Number of Students", value: numStudentsInput.value || appState.numStudents },
+            { label: "Possible Problems", value: possibleProblemsInput.value || appState.possibleProblems },
+        ];
+        
+        let currentX = 15;
+        const colWidth = (doc.internal.pageSize.getWidth() - 40) / 2; 
+        let maxHeightInRow = 0;
+
+        details.forEach((detail, index) => {
+            if (detail.value) {
+                if (index > 0 && index % 2 === 0) { 
+                    currentX = 15;
+                    yPos += maxHeightInRow + 6; 
+                    maxHeightInRow = 0;
+                }
+                 if (yPos > doc.internal.pageSize.getHeight() - 30 && currentX === 15) { 
+                    doc.addPage(); yPos = 15; currentX = 15; maxHeightInRow = 0;
+                }
+
+                doc.setFont("helvetica", "bold");
+                doc.text(`${detail.label}:`, currentX, yPos);
+                doc.setFont("helvetica", "normal");
+                
+                const labelWidth = doc.getTextWidth(`${detail.label}: `) + 2;
+                const valueTextWidth = colWidth - labelWidth - 5; 
+                const splitValue = doc.splitTextToSize(String(detail.value), valueTextWidth > 0 ? valueTextWidth : 10); 
+                
+                doc.text(splitValue, currentX + labelWidth, yPos);
+                const currentItemHeight = (splitValue.length * 5.5); 
+                if (currentItemHeight > maxHeightInRow) {
+                    maxHeightInRow = currentItemHeight;
+                }
+                currentX += colWidth + 10; 
+            }
+        });
+        yPos += maxHeightInRow + 12; 
+
+        doc.setTextColor(0,0,0); 
+
+        if (appState.stages.length > 0) {
+             if (yPos > doc.internal.pageSize.getHeight() - 50) { 
+                doc.addPage(); yPos = 15;
+             }
+            const head = [['STAGE', 'AIM', 'ACTIVITY/PROCEDURE', 'FOCUS', 'MATERIAL', 'TIMING (min)']];
+            const body = appState.stages.map(s => [
+                s.name || '', s.aim || '', s.activity || '', s.focus || '', s.material || '', String(s.timing || '')
+            ]);
+            if (typeof doc.autoTable === 'function') { 
+                doc.autoTable({
+                    startY: yPos,
+                    head: head,
+                    body: body,
+                    theme: 'grid', 
+                    headStyles: { 
+                        fillColor: darkRoyalBlue, 
+                        textColor: [255, 255, 255], 
+                        fontStyle: 'bold',
+                        fontSize: 11 
+                    },
+                    styles: { 
+                        fontSize: 11, 
+                        cellPadding: 2.5, 
+                        overflow: 'linebreak',
+                        textColor: royalBlue 
+                    },
+                    // Removido columnStyles para permitir que a biblioteca ajuste automaticamente
+                });
+            } else {
+                displayMessage("autoTable function not found. Table cannot be generated.", "error");
+                doc.setTextColor(royalBlue[0], royalBlue[1], royalBlue[2]);
+                doc.text("Table data could not be generated (autoTable plugin issue).", 15, yPos);
+                doc.setTextColor(0,0,0);
+            }
+        }
+
+        const fileName = `lesson_plan_${appState.class || 'general'}_${appState.date || new Date().toISOString().split('T')[0]}.pdf`;
+        doc.save(fileName.replace(/[^a-zA-Z0-9_.-]/g, '_')); 
+        displayMessage('PDF generated and download started!');
+    }
+
+    function showConfirmationModal(message, onConfirm) {
+        if (window.confirm(message)) { 
+            onConfirm();
+        }
+    }
+
+    document.getElementById('saveLessonPlan').addEventListener('click', saveState);
+    document.getElementById('loadLessonPlan').addEventListener('click', loadState);
+    document.getElementById('clearLessonPlan').addEventListener('click', clearState);
+    document.getElementById('downloadPdf').addEventListener('click', generatePdf);
+    document.getElementById('generateWithAI').addEventListener('click', generatePlanWithAI); 
+
+    function setDefaultDate() {
+        if (!dateInput.value) {
+            const today = new Date();
+            const currentYear = today.getFullYear(); 
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+            const dd = String(today.getDate()).padStart(2, '0');
+            dateInput.value = `${currentYear}-${mm}-${dd}`;
+        }
+    }
+
+    setDefaultDate();
+    loadState(); 
+});
+</script>
+</body>
+</html>
