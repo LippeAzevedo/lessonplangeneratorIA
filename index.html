@@ -162,57 +162,64 @@
 
         <!-- Left Sidebar (Controls) -->
         <aside class="glass-pane lg:w-1/3 xl:w-1/4 flex flex-col lg:sticky top-4 lg:max-h-[calc(100vh-2rem)]">
-            <div class="scrollable-content p-4 sm:p-6 space-y-6">
-                <!-- Header -->
-                <div class="text-center">
-                    <img src="https://i.ibb.co/MkDD3dxc/passaporte-logotipo.png" alt="Passaporte Edu Logo" class="mx-auto mb-4 h-24" >
-                    <h1 class="text-2xl font-bold text-white">Lesson Plan Generator</h1>
-                    <p class="text-sm text-slate-400">v6.0 - Aurora Edition</p>
-                </div>
-                
-                <div id="message-area" class="h-14"></div>
+            <div class="scrollable-content p-4 sm:p-6 flex flex-col">
+                <div class="flex-grow">
+                    <!-- Header -->
+                    <div class="text-center">
+                        <img src="https://i.ibb.co/MkDD3dxc/passaporte-logotipo.png" alt="Passaporte Edu Logo" class="mx-auto mb-4 h-24" >
+                        <h1 class="text-2xl font-bold text-white">Lesson Plan Generator</h1>
+                        <p class="text-sm text-slate-400">v6.0 - Aurora Edition</p>
+                    </div>
+                    
+                    <div id="message-area" class="h-14"></div>
 
-                <!-- Main Info Form -->
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-white border-b border-slate-700 pb-2">Lesson Details</h2>
-                    <div>
-                        <label class="form-label">Teacher</label>
-                        <div id="teacher" contenteditable="true" class="editable-div" data-placeholder="Enter teacher's name"></div>
+                    <!-- Main Info Form -->
+                    <div class="space-y-4">
+                        <h2 class="text-lg font-semibold text-white border-b border-slate-700 pb-2">Lesson Details</h2>
+                        <div>
+                            <label class="form-label">Teacher</label>
+                            <div id="teacher" contenteditable="true" class="editable-div" data-placeholder="Enter teacher's name"></div>
+                        </div>
+                        <div>
+                            <label class="form-label">Date</label>
+                            <input type="date" id="date" class="form-input">
+                        </div>
+                        <div>
+                            <label class="form-label">Lesson Topic (for AI)</label>
+                            <div id="lessonTopic" contenteditable="true" class="editable-div" data-placeholder="e.g., Simple Present with He/She/It"></div>
+                        </div>
+                         <div>
+                            <label class="form-label">Student Interests (Optional)</label>
+                            <div id="studentInterests" contenteditable="true" class="editable-div" data-placeholder="e.g., games, music, travel"></div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="form-label">Date</label>
-                        <input type="date" id="date" class="form-input">
-                    </div>
-                    <div>
-                        <label class="form-label">Lesson Topic (for AI)</label>
-                        <div id="lessonTopic" contenteditable="true" class="editable-div" data-placeholder="e.g., Simple Present with He/She/It"></div>
-                    </div>
-                     <div>
-                        <label class="form-label">Student Interests (Optional)</label>
-                        <div id="studentInterests" contenteditable="true" class="editable-div" data-placeholder="e.g., games, music, travel"></div>
-                    </div>
-                </div>
 
-                <!-- Actions Section -->
-                <div class="space-y-3 pt-4">
-                    <button id="generateWithAI" class="btn btn-ai w-full text-base">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <span id="ai-button-text">Generate with AI</span>
-                    </button>
-                     <div class="grid grid-cols-2 gap-3">
-                        <button id="applyTemplateBtn" class="btn bg-slate-700 text-slate-200 hover:bg-slate-600 focus:ring-slate-500"><i class="fa-solid fa-file-alt"></i> 150min Template</button>
-                        <button id="downloadPdf" class="btn btn-primary"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
-                     </div>
-                </div>
+                    <!-- Actions Section -->
+                    <div class="space-y-3 pt-4">
+                        <button id="generateWithAI" class="btn btn-ai w-full text-base">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span id="ai-button-text">Generate with AI</span>
+                        </button>
+                         <div class="grid grid-cols-2 gap-3">
+                            <button id="applyTemplateBtn" class="btn bg-slate-700 text-slate-200 hover:bg-slate-600 focus:ring-slate-500"><i class="fa-solid fa-file-alt"></i> 150min Template</button>
+                            <button id="downloadPdf" class="btn btn-primary"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+                         </div>
+                    </div>
 
-                <!-- Backup Section -->
-                 <div class="space-y-3 pt-4">
-                    <h2 class="text-lg font-semibold text-white border-b border-slate-700 pb-2">Backup & Restore</h2>
-                     <div class="grid grid-cols-2 gap-3">
-                        <button id="backupToFile" class="btn bg-emerald-600 text-white hover:bg-emerald-500 focus:ring-emerald-500"><i class="fa-solid fa-download"></i> Backup</button>
-                        <button id="loadFromFile" class="btn bg-transparent border-2 border-slate-600 text-slate-300 hover:bg-slate-800"><i class="fa-solid fa-upload"></i> Load</button>
+                    <!-- Backup Section -->
+                     <div class="space-y-3 pt-4">
+                        <h2 class="text-lg font-semibold text-white border-b border-slate-700 pb-2">Backup & Restore</h2>
+                         <div class="grid grid-cols-2 gap-3">
+                            <button id="backupToFile" class="btn bg-emerald-600 text-white hover:bg-emerald-500 focus:ring-emerald-500"><i class="fa-solid fa-download"></i> Backup</button>
+                            <button id="loadFromFile" class="btn bg-transparent border-2 border-slate-600 text-slate-300 hover:bg-slate-800"><i class="fa-solid fa-upload"></i> Load</button>
+                        </div>
                     </div>
                 </div>
+                <!-- Credits Footer -->
+                <footer class="text-center text-xs text-slate-500 pt-6 mt-auto">
+                    <p>Developed by: Philippe Azevedo from Passaporte Edu</p>
+                    <p>version 2.0 w/ AI</p>
+                </footer>
             </div>
         </aside>
 
@@ -230,7 +237,7 @@
                     </div>
                     <div class="flex items-center gap-3 w-full sm:w-auto">
                         <button id="clearLessonPlan" class="btn btn-danger flex-1 sm:flex-none"><i class="fa-solid fa-trash"></i> Clear</button>
-                        <button id="openAddStageModal" class="btn btn-primary flex-1 sm:flex-none selection-button add-stage-btn" data-field="addStage" data-title="Add New Stage"><i class="fa-solid fa-plus"></i> Add Stage</button>
+                        <button class="btn btn-primary flex-1 sm:flex-none selection-button add-stage-btn" data-field="addStage" data-title="Add New Stage"><i class="fa-solid fa-plus"></i> Add Stage</button>
                     </div>
                 </div>
                 
@@ -648,57 +655,90 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
-    // --- MODULE: AI Engine (Local Simulation) ---
+    // --- MODULE: AI Engine (Generative) ---
     const AIModule = {
         async generatePlan() {
-            const { lessonTopic, studentInterests } = AppState.data;
-            if (!lessonTopic) { UIModule.displayMessage("Please provide the 'Lesson Topic' for the AI.", "error"); return; }
+            const { lessonTopic, studentInterests, classType, numStudents, levelCourseType, levelDetail } = AppState.data;
+            if (!lessonTopic) { 
+                UIModule.displayMessage("Please provide the 'Lesson Topic' for the AI.", "error"); 
+                return; 
+            }
+            
             const aiButton = document.getElementById('generateWithAI');
             const originalButtonHtml = aiButton.innerHTML;
             aiButton.disabled = true;
             aiButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Generating...`;
-            UIModule.displayMessage("Crafting your 150min lesson plan...", "info");
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            try {
-                const interestsText = studentInterests ? ` incorporating their interests in ${studentInterests}` : ` related to ${lessonTopic}`;
-                const baseStages = UIModule.config.template150min;
-                const newStages = baseStages.map(stage => {
-                    let newStage = {...stage, id: crypto.randomUUID()};
-                    switch(stage.name) {
-                        case 'Warm Up!':
-                            newStage.aim = `To engage students and introduce the context of the lesson${interestsText}.`;
-                            newStage.activity = `Teacher initiates a brief conversation related to ${studentInterests || 'daily routines'} to activate prior knowledge. Asks questions like "What do you do every day?" or "What games do you like to play?".`;
-                            newStage.focus = 'T-S'; newStage.material = 'Whiteboard'; break;
-                        case 'Presentation':
-                             newStage.aim = `To present and clarify the structure and use of "${lessonTopic}".`;
-                             newStage.activity = `Teacher writes examples of "${lessonTopic}" on the board, using context from the warm-up. Explains the rules, form (affirmative, negative, interrogative), and pronunciation. Uses concept-checking questions (CCQs) to ensure understanding.`;
-                             newStage.focus = 'T-S'; newStage.material = 'Whiteboard, markers'; break;
-                        case 'Practice':
-                            newStage.aim = `To provide controlled practice of "${lessonTopic}".`;
-                            newStage.activity = `Students complete a gap-fill exercise or a matching activity in pairs. The exercise focuses on the correct form of the target language. Teacher monitors and provides correction.`;
-                            newStage.focus = 'S-S, T-S'; newStage.material = 'Worksheet/Digital Activity'; break;
-                        case 'Production':
-                            newStage.aim = `To allow students to use "${lessonTopic}" in a freer, more communicative context.`;
-                            newStage.activity = `In small groups, students create a short dialogue or a story about their favorite celebrity or fictional character (inspired by ${studentInterests || 'pop culture'}), using "${lessonTopic}". They then present it to the class.`;
-                            newStage.focus = 'S-S, S-Class'; newStage.material = 'Pen and paper'; break;
-                        case 'Wrap Up!':
-                             newStage.aim = 'To review the key points of the lesson and provide feedback.';
-                             newStage.activity = 'Teacher summarizes the main grammar point, highlights common errors from the production stage, and praises students for their effort. Assigns homework if applicable.';
-                             newStage.focus = 'T-S'; newStage.material = 'Whiteboard'; break;
-                        case 'Break':
-                            newStage.aim = 'A short break for students to rest.';
-                            newStage.activity = 'Students take a 15-minute break.'; break;
-                        default: newStage.aim = ''; newStage.activity = '';
-                    }
-                    return newStage;
-                });
+            UIModule.displayMessage("Researching and crafting your lesson plan...", "info");
 
-                AppState.data.stages = newStages;
-                UIModule.renderAll();
-                UIModule.displayMessage('AI has successfully generated your lesson plan!', 'success');
+            const prompt = `
+                Create a creative and unique 150-minute lesson plan based on the PPP (Presentation, Practice, Production) methodology.
+                The plan is for the following context:
+                - Lesson Topic: "${lessonTopic}"
+                - Class Type: "${classType}"
+                - Number of Students: ${numStudents || 'a small group'}
+                - Course: ${levelCourseType}
+                - Level/Book: ${levelDetail}
+                - Student Interests: ${studentInterests || 'not specified'}
+
+                Generate a JSON array of stage objects. Each object must have "name", "timing", "aim", "activity", "focus", and "material" properties.
+                The "activity" description MUST be in the third person (e.g., "The teacher will...").
+                The total time must be exactly 150 minutes. Use the standard Passaporte Edu stage structure: Warm Up, Presentation, Practice, Practice, Production, Break, Practice, Production, Wrap Up.
+                Do NOT include YouTube or Baamboozle links. Instead, create unique and engaging activities for each stage that are highly specific to the context provided.
+            `;
+            
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = {
+                    contents: chatHistory,
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    "name": { "type": "STRING" },
+                                    "timing": { "type": "INTEGER" },
+                                    "aim": { "type": "STRING" },
+                                    "activity": { "type": "STRING" },
+                                    "focus": { "type": "STRING" },
+                                    "material": { "type": "STRING" },
+                                },
+                                required: ["name", "timing", "aim", "activity", "focus", "material"]
+                            }
+                        }
+                    }
+                };
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+                
+                const result = await response.json();
+
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0].text) {
+                    const generatedStages = JSON.parse(result.candidates[0].content.parts[0].text);
+                    AppState.data.stages = generatedStages.map(s => ({ ...s, id: crypto.randomUUID() }));
+                    UIModule.renderAll();
+                    UIModule.displayMessage('AI has successfully generated your lesson plan!', 'success');
+                } else {
+                    throw new Error("Invalid response structure from AI.");
+                }
             } catch (error) {
                 console.error("AI Generation Error:", error);
-                UIModule.displayMessage('An error occurred during AI generation.', 'error');
+                UIModule.displayMessage('AI generation failed. Please try again.', 'error');
+                // Fallback to template if AI fails
+                AppState.data.stages = UIModule.config.template150min.map(s => ({...s, id: crypto.randomUUID(), aim:'', activity:'', focus:'', material:''}));
+                UIModule.renderAll();
             } finally {
                 aiButton.disabled = false;
                 aiButton.innerHTML = originalButtonHtml;
