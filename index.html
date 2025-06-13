@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesson Plan Generator 5.9 - Aurora Edition</title>
+    <title>Lesson Plan Generator 6.0 - Aurora Edition</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -60,7 +60,7 @@
             background: var(--color-glass);
             backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--color-border);
-            border-radius: 1.5rem; /* 24px */
+            border-radius: 1.5rem;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
             transition: all 0.3s ease;
         }
@@ -74,12 +74,11 @@
 
         /* --- Custom Inputs & Selects --- */
         .form-label { @apply block mb-1.5 text-sm font-medium text-slate-400; }
-        .form-input { /* Only for date type now */
+        .form-input { 
              @apply w-full bg-slate-900/70 border-2 border-slate-700/80 text-slate-200 text-sm rounded-lg
                    placeholder-slate-500 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] px-3 py-[9px]
                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-600 focus:bg-slate-900 transition-all duration-200;
         }
-        /* Themed Date Picker */
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6) brightness(1.5); cursor: pointer; }
 
         .editable-div {
@@ -95,9 +94,7 @@
                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-600 focus:bg-slate-900 transition-all duration-200
                    flex items-center justify-between text-left;
         }
-        .selection-button.add-stage-btn {
-            @apply btn btn-primary flex-1 sm:flex-none justify-center;
-        }
+        .selection-button.add-stage-btn { @apply btn btn-primary flex-1 sm:flex-none justify-center; }
         .selection-button:not(.add-stage-btn)::after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; @apply text-slate-500; }
         
         /* --- Stage-Specific Input Styling --- */
@@ -143,8 +140,9 @@
              @apply w-full text-center p-4 bg-slate-800/60 hover:bg-indigo-600/80 rounded-lg transition-all duration-300 border-2 border-slate-700
                     focus:outline-none focus:ring-2 focus:ring-sky-400 ease-in-out;
         }
+        .option-button:hover { @apply shadow-[0_0_15px_rgba(99,102,241,0.5)]; }
         .option-button.is-selected {
-            @apply bg-indigo-600 ring-2 ring-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.3)];
+            @apply bg-indigo-600 ring-2 ring-sky-400 shadow-[0_0_20px_rgba(56,189,248,0.5)];
         }
 
     </style>
@@ -153,7 +151,7 @@
 
     <!-- Loading Screen -->
     <div id="loading-screen">
-        <img src="https://www.passaporteedu.com.br/images/logotipo_slogan.svg" alt="Loading Logo" class="h-32">
+        <img src="https://i.ibb.co/MkDD3dxc/passaporte-logotipo.png" alt="Loading Logo" class="h-32">
     </div>
 
     <!-- Particle Background -->
@@ -167,9 +165,9 @@
             <div class="scrollable-content p-4 sm:p-6 space-y-6">
                 <!-- Header -->
                 <div class="text-center">
-                    <img src="https://www.passaporteedu.com.br/images/logotipo_slogan.svg" alt="Passaporte Edu Logo" class="mx-auto mb-4 h-24" >
+                    <img src="https://i.ibb.co/MkDD3dxc/passaporte-logotipo.png" alt="Passaporte Edu Logo" class="mx-auto mb-4 h-24" >
                     <h1 class="text-2xl font-bold text-white">Lesson Plan Generator</h1>
-                    <p class="text-sm text-slate-400">v5.9 - Aurora Edition</p>
+                    <p class="text-sm text-slate-400">v6.0 - Aurora Edition</p>
                 </div>
                 
                 <div id="message-area" class="h-14"></div>
@@ -292,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
     
-    const LOGO_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAaQAAABDCAYAAAC0t1iVAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAstSURBVHhe7d3vbltFFgbg9/sO/B/gD/CH+AMsWLGkSJEiRYqkvZvYtJCEbI4kIaRJktU22c3bsztnHOfBCuBE8OLAiT3fB4Cg22E8/QkAAAAACQ8AAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAAS-ASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAAS-ASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAAS-ASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAAASAgAAAA-p';
+    const LOGO_URL = 'https://i.ibb.co/MkDD3dxc/passaporte-logotipo.png';
 
     // --- INITIAL SETUP ---
     const initParticles = () => {
@@ -339,12 +337,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- MODULE: Storage ---
     const StorageModule = {
         save: debounce(() => { 
-            localStorage.setItem('lessonPlanDataV5_9', JSON.stringify(AppState.data)); 
+            localStorage.setItem('lessonPlanDataV6_0', JSON.stringify(AppState.data)); 
             UIModule.displayMessage('Progress saved!', 'info');
         }, 1200),
         load() {
             try {
-                const savedData = localStorage.getItem('lessonPlanDataV5_9');
+                const savedData = localStorage.getItem('lessonPlanDataV6_0');
                 if (savedData) { AppState.loadState(JSON.parse(savedData)); }
                 else { UIModule.renderAll(); UIModule.setDefaultDate(); }
             } catch (e) { 
@@ -710,41 +708,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- MODULE: PDF Generation ---
     const PDFModule = {
+        loadImageAsBase64(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const dataURL = canvas.toDataURL('image/png');
+                    resolve(dataURL);
+                };
+                img.onerror = (e) => {
+                    console.error("Image load error:", e);
+                    reject(new Error('Failed to load image for PDF'));
+                };
+                img.src = url;
+            });
+        },
         async generate() {
             UIModule.displayMessage('Generating PDF...', 'info');
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            const doc = new jsPDF({ orientation: 'landscape' });
             const state = AppState.data;
             try {
-                // PDF Header
+                const logoData = await this.loadImageAsBase64(LOGO_URL);
+                doc.addImage(logoData, 'PNG', 15, 12, 50, 25);
+                
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(20);
                 doc.setTextColor(30, 30, 30);
-                doc.text('Lesson Plan', 105, 20, { align: 'center' });
+                doc.text('LESSON PLAN', 148, 25, { align: 'center' });
                 
-                doc.setFontSize(11);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Teacher: ${state.teacher || 'N/A'}`, 15, 40);
-                doc.text(`Date: ${state.date || 'N/A'}`, 15, 46);
-                doc.text(`Lesson Topic: ${state.lessonTopic || 'N/A'}`, 105, 40, { align: 'center' });
-                doc.line(15, 52, 195, 52);
-
-                const head = [['#', 'Stage', 'Time (min)', 'Aim', 'Activity/Procedure', 'Focus', 'Material']];
-                const body = state.stages.map((stage, index) => [ index + 1, stage.name || '', stage.timing || '0', stage.aim || '', stage.activity || '', stage.focus || '', stage.material || '', ]);
-                doc.autoTable({ head, body, startY: 60, theme: 'grid', headStyles: { fillColor: [41, 128, 185], textColor: 255 }, styles: { cellPadding: 2, fontSize: 9, valign: 'middle' }, columnStyles: { 0: { cellWidth: 8 }, 1: { cellWidth: 20 }, 2: { cellWidth: 12, halign: 'center' }, 3: { cellWidth: 'auto' }, 4: { cellWidth: 'auto' }, 5: { cellWidth: 15 }, 6: { cellWidth: 20 } } });
-                
-                let finalY = doc.lastAutoTable.finalY || 60;
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'bold');
-                doc.text('Additional Information', 15, finalY + 15);
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'normal');
-                doc.text([ `Class Type: ${state.classType || 'N/A'}`, `No. of Students: ${state.numStudents || 'N/A'}`, `Course: ${state.levelCourseType || 'N/A'}`, `Level/Book: ${state.levelDetail || 'N/A'}`, ], 15, finalY + 22);
-                
-                doc.setFont('helvetica', 'bold');
-                doc.text('Anticipated Problems & Solutions:', 15, finalY + 42);
-                doc.setFont('helvetica', 'normal');
-                doc.text(doc.splitTextToSize(state.possibleProblems || 'No problems anticipated.', 180), 15, finalY + 48);
+
+                const col1X = 15;
+                const col2X = 148;
+                let currentY = 40;
+
+                doc.text(`Teacher: ${state.teacher || 'N/A'}`, col1X, currentY);
+                doc.text(`Date: ${state.date || 'N/A'}`, col2X, currentY);
+                currentY += 6;
+                doc.text(`Class type: ${state.classType || 'N/A'}`, col1X, currentY);
+                doc.text(`Class: ${state.levelCourseType || 'N/A'} - ${state.levelDetail || 'N/A'}`, col2X, currentY);
+                currentY += 6;
+                const aimText = `Aim of the Lesson: ${state.lessonTopic || 'N/A'}`;
+                const objectiveText = `Objective: At the end of the class, students should be able to effectively talk about ${state.lessonTopic || 'the lesson topic'}.`;
+                doc.text(doc.splitTextToSize(aimText, 130), col1X, currentY);
+                doc.text(`Number of students: ${state.numStudents || 'N/A'}`, col2X, currentY);
+                currentY += 10;
+                doc.text(doc.splitTextToSize(objectiveText, 260), col1X, currentY);
+                currentY += 10;
+                doc.text(doc.splitTextToSize(`Antecipated problems and solutions: ${state.possibleProblems || 'N/A'}`, 260), col1X, currentY);
+
+                const head = [['STAGE', 'AIM', 'ACTIVITY/PROCEDURE', 'FOCUS', 'MATERIAL', 'TIMING']];
+                const body = state.stages.map(stage => [
+                    stage.name || '',
+                    stage.aim || '',
+                    stage.activity || '',
+                    stage.focus || '',
+                    stage.material || '',
+                    `${stage.timing || '0'}'`
+                ]);
+
+                doc.autoTable({
+                    head: head,
+                    body: body,
+                    startY: currentY + 10,
+                    theme: 'grid',
+                    headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' },
+                    styles: { cellPadding: 2, fontSize: 9, valign: 'middle' },
+                    columnStyles: {
+                        0: { cellWidth: 35 },
+                        1: { cellWidth: 50 },
+                        2: { cellWidth: 'auto' },
+                        3: { cellWidth: 30 },
+                        4: { cellWidth: 30 },
+                        5: { cellWidth: 15, halign: 'center' }
+                    }
+                });
                 
                 doc.save(`Lesson_Plan_${state.teacher || 'User'}_${state.date}.pdf`);
                 UIModule.displayMessage('PDF downloaded successfully!', 'success');
