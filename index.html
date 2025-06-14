@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesson Plan Generator 6.0 - Aurora Edition</title>
+    <title>Lesson Plan Generator 6.1 - Aurora Edition</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -168,7 +168,7 @@
                     <div class="text-center">
                         <img src="https://i.ibb.co/MkDD3dxc/passaporte-logotipo.png" alt="Passaporte Edu Logo" class="mx-auto mb-4 h-24" >
                         <h1 class="text-2xl font-bold text-white">Lesson Plan Generator</h1>
-                        <p class="text-sm text-slate-400">v6.0 - Aurora Edition</p>
+                        <p class="text-sm text-slate-400">v6.1 - Aurora Edition</p>
                     </div>
                     
                     <div id="message-area" class="h-14"></div>
@@ -344,12 +344,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- MODULE: Storage ---
     const StorageModule = {
         save: debounce(() => { 
-            localStorage.setItem('lessonPlanDataV6_0', JSON.stringify(AppState.data)); 
+            localStorage.setItem('lessonPlanDataV6_1', JSON.stringify(AppState.data)); 
             UIModule.displayMessage('Progress saved!', 'info');
         }, 1200),
         load() {
             try {
-                const savedData = localStorage.getItem('lessonPlanDataV6_0');
+                const savedData = localStorage.getItem('lessonPlanDataV6_1');
                 if (savedData) { AppState.loadState(JSON.parse(savedData)); }
                 else { UIModule.renderAll(); UIModule.setDefaultDate(); }
             } catch (e) { 
@@ -658,6 +658,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- MODULE: AI Engine (Generative) ---
     const AIModule = {
         async generatePlan() {
+            const apiKey = "AIzaSyD_wk9jgd61whdzlibIe00su-cqynWV0PA";
             const { lessonTopic, studentInterests, classType, numStudents, levelCourseType, levelDetail } = AppState.data;
             if (!lessonTopic) { 
                 UIModule.displayMessage("Please provide the 'Lesson Topic' for the AI.", "error"); 
@@ -710,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 };
-                const apiKey = ""; 
+                
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(apiUrl, {
@@ -720,7 +721,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`API request failed with status ${response.status}`);
+                    const errorData = await response.json();
+                    console.error("API Error:", errorData);
+                    throw new Error(`API request failed with status ${response.status}: ${errorData.error.message}`);
                 }
                 
                 const result = await response.json();
@@ -736,9 +739,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error("AI Generation Error:", error);
                 UIModule.displayMessage('AI generation failed. Please try again.', 'error');
-                // Fallback to template if AI fails
-                AppState.data.stages = UIModule.config.template150min.map(s => ({...s, id: crypto.randomUUID(), aim:'', activity:'', focus:'', material:''}));
-                UIModule.renderAll();
             } finally {
                 aiButton.disabled = false;
                 aiButton.innerHTML = originalButtonHtml;
