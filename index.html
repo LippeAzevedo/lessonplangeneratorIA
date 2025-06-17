@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesson Plan Generator 6.1 - Aurora Edition</title>
+    <title>Lesson Plan Generator 6.2 - Aurora Edition</title>
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -168,7 +168,7 @@
                     <div class="text-center">
                         <img src="https://i.ibb.co/MkDD3dxc/passaporte-logotipo.png" alt="Passaporte Edu Logo" class="mx-auto mb-4 h-24" >
                         <h1 class="text-2xl font-bold text-white">Lesson Plan Generator</h1>
-                        <p class="text-sm text-slate-400">v6.1 - Aurora Edition</p>
+                        <p class="text-sm text-slate-400">v6.2 - Aurora Edition</p>
                     </div>
                     
                     <div id="message-area" class="h-14"></div>
@@ -183,6 +183,10 @@
                         <div>
                             <label class="form-label">Date</label>
                             <input type="date" id="date" class="form-input">
+                        </div>
+                        <div>
+                            <label class="form-label">Class</label>
+                            <div id="class" contenteditable="true" class="editable-div" data-placeholder="E.g. Teens 10"></div>
                         </div>
                         <div>
                             <label class="form-label">Lesson Topic (for AI)</label>
@@ -323,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const AppState = {
         data: {
             teacher: '', classType: 'Presentation - Grammar', lessonTopic: '', studentInterests: '',
-            date: '', levelCourseType: 'KDGT', levelDetail: '', numStudents: '',
+            date: '', class: '', levelCourseType: 'KDGT', levelDetail: '', numStudents: '',
             possibleProblems: '', stages: []
         },
         loadState(newState) { 
@@ -333,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clear() {
             this.data = {
                 teacher: '', classType: 'Presentation - Grammar', lessonTopic: '', studentInterests: '',
-                date: '', levelCourseType: 'KDGT', levelDetail: 'A1-', numStudents: '',
+                date: '', class: '', levelCourseType: 'KDGT', levelDetail: 'A1-', numStudents: '',
                 possibleProblems: '', stages: []
             };
             UIModule.renderAll(); 
@@ -344,12 +348,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- MODULE: Storage ---
     const StorageModule = {
         save: debounce(() => { 
-            localStorage.setItem('lessonPlanDataV6_1', JSON.stringify(AppState.data)); 
+            localStorage.setItem('lessonPlanDataV6_2', JSON.stringify(AppState.data)); 
             UIModule.displayMessage('Progress saved!', 'info');
         }, 1200),
         load() {
             try {
-                const savedData = localStorage.getItem('lessonPlanDataV6_1');
+                const savedData = localStorage.getItem('lessonPlanDataV6_2');
                 if (savedData) { AppState.loadState(JSON.parse(savedData)); }
                 else { UIModule.renderAll(); UIModule.setDefaultDate(); }
             } catch (e) { 
@@ -416,7 +420,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 teacher: document.getElementById('teacher'),
                 lessonTopic: document.getElementById('lessonTopic'), 
                 studentInterests: document.getElementById('studentInterests'),
-                date: document.getElementById('date'), 
+                date: document.getElementById('date'),
+                class: document.getElementById('class'),
                 numStudents: document.getElementById('numStudents'),
                 possibleProblems: document.getElementById('possibleProblems'), 
                 stagesContainer: document.getElementById('stages-container'),
@@ -490,7 +495,8 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (id === 'loadFromFile') StorageModule.loadFromFile();
             else if (id === 'applyTemplateBtn') {
                 this.showConfirmation('Apply the 150min template? This will replace current stages.', () => {
-                    AppState.data.stages = this.config.template150min.map(s => ({...s, id: crypto.randomUUID(), aim:'', activity:'', focus:'', material:''}));
+                    const timings = { warmUp: 7, presentation: 25, practice: 15, production: 20, wrapUp: 5, break: 15 };
+                    AppState.data.stages = this.getTemplate(timings).map(s => ({...s, id: crypto.randomUUID(), aim:'', activity:'', focus:'', material:''}));
                     this.renderStages(); 
                     this.displayMessage(`Template applied successfully.`, 'success');
                     StorageModule.save();
@@ -506,11 +512,25 @@ document.addEventListener('DOMContentLoaded', () => {
                  });
             }
         },
+        getTemplate(timings) {
+             return [ 
+                { name: "Warm Up!", timing: timings.warmUp }, 
+                { name: "Presentation", timing: timings.presentation }, 
+                { name: "Practice", timing: timings.practice }, 
+                { name: "Practice", timing: timings.practice }, 
+                { name: "Production", timing: timings.production }, 
+                { name: "Break", timing: timings.break }, 
+                { name: "Practice", timing: timings.practice }, 
+                { name: "Production", timing: timings.production }, 
+                { name: "Wrap Up!", timing: timings.wrapUp } 
+            ];
+        },
         renderAll() {
             const state = AppState.data;
             this.elements.teacher.textContent = state.teacher || ''; 
             this.elements.lessonTopic.textContent = state.lessonTopic || '';
             this.elements.studentInterests.textContent = state.studentInterests || '';
+            this.elements.class.textContent = state.class || '';
             this.elements.numStudents.textContent = state.numStudents || '';
             this.elements.possibleProblems.textContent = state.possibleProblems || '';
             this.elements.date.value = state.date || '';
@@ -574,7 +594,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.stageCount.textContent = AppState.data.stages.length;
             const totalTime = AppState.data.stages.reduce((sum, stage) => sum + (parseInt(stage.timing) || 0), 0);
             this.elements.totalTime.textContent = totalTime;
-            this.elements.totalTime.parentElement.classList.toggle('text-red-500', totalTime > 150);
         },
         displayMessage(message, type = 'success') {
             const colors = { success: 'bg-emerald-500/80', error: 'bg-red-500/80', info: 'bg-sky-500/80' };
@@ -647,7 +666,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.openModal(modal);
         },
         addStage(name) {
-            const timing = { 'Warm Up!': 7, 'Presentation': 25, 'Practice': 15, 'Production': 20, 'Break': 15, 'Wrap Up!': 8 }[name] || 10;
+            const timings = { 'Warm Up!': 7, 'Presentation': 25, 'Practice': 15, 'Production': 20, 'Wrap Up!': 5, 'Break': 15 };
+            const timing = timings[name] || 10;
             AppState.data.stages.push({ id: crypto.randomUUID(), name, timing, aim: '', activity: '', focus: '', material: '' });
             this.renderStages(); 
             this.displayMessage(`Stage "${name}" added.`, 'success');
@@ -658,8 +678,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- MODULE: AI Engine (Generative) ---
     const AIModule = {
         async generatePlan() {
-            const apiKey = "AIzaSyD_wk9jgd61whdzlibIe00su-cqynWV0PA";
-            const { lessonTopic, studentInterests, classType, numStudents, levelCourseType, levelDetail } = AppState.data;
+            const apiKey = "AIzaSyD_wk9jgd61whdzlibIe00su-cqynWV0PA"; // Integrated API Key
+            const { lessonTopic, studentInterests, classType, numStudents, levelCourseType, levelDetail, class: className } = AppState.data;
             if (!lessonTopic) { 
                 UIModule.displayMessage("Please provide the 'Lesson Topic' for the AI.", "error"); 
                 return; 
@@ -676,15 +696,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 The plan is for the following context:
                 - Lesson Topic: "${lessonTopic}"
                 - Class Type: "${classType}"
+                - Class Name: "${className}"
                 - Number of Students: ${numStudents || 'a small group'}
                 - Course: ${levelCourseType}
                 - Level/Book: ${levelDetail}
                 - Student Interests: ${studentInterests || 'not specified'}
 
-                Generate a JSON array of stage objects. Each object must have "name", "timing", "aim", "activity", "focus", and "material" properties.
-                The "activity" description MUST be in the third person (e.g., "The teacher will...").
-                The total time must be exactly 150 minutes. Use the standard Passaporte Edu stage structure: Warm Up, Presentation, Practice, Practice, Production, Break, Practice, Production, Wrap Up.
-                Do NOT include YouTube or Baamboozle links. Instead, create unique and engaging activities for each stage that are highly specific to the context provided.
+                Generate a JSON array of 9 stage objects. Each object must have "name", "timing", "aim", "activity", "focus", and "material" properties.
+                The "activity" description MUST be in the third person (e.g., "The teacher will show...").
+                For the "focus" property, use only standard interaction patterns like "T-S" (Teacher-to-Student), "S-S" (Student-to-Student), or "S-T" (Student-to-Teacher).
+                The total time must be exactly 150 minutes, following this specific structure and strict timings:
+                - Warm Up: 7 minutes
+                - Presentation: 25 minutes
+                - Practice: 15 minutes
+                - Practice: 15 minutes
+                - Production: 20 minutes
+                - Break: 15 minutes
+                - Practice: 25 minutes, but this one MUST BE DIVIDED INTO TWO OR MORE SMALLER ACTIVITIES, and the total time for this stage must not exceed 25 minutes. One of the activities must not exceed 15 minutes.
+                - Production: 20 minutes
+                - Wrap Up: 8 minutes
+                
+                Ensure each "Practice" stage does not exceed 15 minutes, except for the one after the break that can go up to 25 minutes.
+                Ensure each "Production" stage does not exceed 20 minutes.
+                Ensure the "Break" is exactly 15 minutes.
+                Ensure "Warm Up" is 7 minutes and "Wrap Up" is 5 minutes.
+                Create unique and engaging activities for each stage that are highly specific to the provided context. Do not use generic placeholders.
             `;
             
             try {
@@ -793,13 +829,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 doc.text(`Date: ${state.date || 'N/A'}`, col2X, currentY);
                 currentY += 6;
                 doc.text(`Class type: ${state.classType || 'N/A'}`, col1X, currentY);
-                doc.text(`Class: ${state.levelCourseType || 'N/A'} - ${state.levelDetail || 'N/A'}`, col2X, currentY);
+                doc.text(`Class: ${state.class || 'N/A'}`, col2X, currentY);
+                currentY += 6;
+                doc.text(`Level: ${state.levelCourseType || 'N/A'} - ${state.levelDetail || 'N/A'}`, col1X, currentY);
+                doc.text(`Number of students: ${state.numStudents || 'N/A'}`, col2X, currentY);
                 currentY += 6;
                 const aimText = `Aim of the Lesson: ${state.lessonTopic || 'N/A'}`;
-                const objectiveText = `Objective: At the end of the class, students should be able to effectively talk about ${state.lessonTopic || 'the lesson topic'}.`;
-                doc.text(doc.splitTextToSize(aimText, 130), col1X, currentY);
-                doc.text(`Number of students: ${state.numStudents || 'N/A'}`, col2X, currentY);
+                doc.text(doc.splitTextToSize(aimText, 260), col1X, currentY);
                 currentY += 10;
+                const objectiveText = `Objective: At the end of the class, students should be able to effectively talk about ${state.lessonTopic || 'the lesson topic'}.`;
                 doc.text(doc.splitTextToSize(objectiveText, 260), col1X, currentY);
                 currentY += 10;
                 doc.text(doc.splitTextToSize(`Antecipated problems and solutions: ${state.possibleProblems || 'N/A'}`, 260), col1X, currentY);
