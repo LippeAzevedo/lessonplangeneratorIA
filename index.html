@@ -189,8 +189,12 @@
                             <div id="class" contenteditable="true" class="editable-div" data-placeholder="E.g. Teens 10"></div>
                         </div>
                         <div>
-                            <label class="form-label">Lesson Topic (for AI)</label>
+                            <label class="form-label">Lesson Topic</label>
                             <div id="lessonTopic" contenteditable="true" class="editable-div" data-placeholder="e.g., Simple Present with He/She/It"></div>
+                        </div>
+                        <div>
+                            <label class="form-label">Aim of the Lesson</label>
+                            <div id="lessonAim" contenteditable="true" class="editable-div" data-placeholder="The AI will generate this..."></div>
                         </div>
                          <div>
                             <label class="form-label">Student Interests (Optional)</label>
@@ -326,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- MODULE: State Management ---
     const AppState = {
         data: {
-            teacher: '', classType: 'Presentation - Grammar', lessonTopic: '', studentInterests: '',
+            teacher: '', classType: 'Presentation - Grammar', lessonTopic: '', lessonAim: '', studentInterests: '',
             date: '', class: '', levelCourseType: 'KDGT', levelDetail: '', numStudents: '',
             possibleProblems: '', stages: []
         },
@@ -336,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         clear() {
             this.data = {
-                teacher: '', classType: 'Presentation - Grammar', lessonTopic: '', studentInterests: '',
+                teacher: '', classType: 'Presentation - Grammar', lessonTopic: '', lessonAim: '', studentInterests: '',
                 date: '', class: '', levelCourseType: 'KDGT', levelDetail: 'A1-', numStudents: '',
                 possibleProblems: '', stages: []
             };
@@ -412,13 +416,26 @@ document.addEventListener('DOMContentLoaded', () => {
                  espanholLevels: ["Spanish A1-", "Spanish A1", "Spanish A1+", "Spanish A2-", "Spanish A2", "Spanish A2+"],
             },
             addStage: ["Warm Up!", "Presentation", "Practice", "Production", "Break", "Wrap Up!", "Homework", "Custom Stage"],
-            template150min: [ { name: "Warm Up!", timing: 7 }, { name: "Presentation", timing: 25 }, { name: "Practice", timing: 15 }, { name: "Practice", timing: 15 }, { name: "Production", timing: 20 }, { name: "Break", timing: 15 }, { name: "Practice", timing: 25 }, { name: "Production", timing: 20 }, { name: "Wrap Up!", timing: 8 } ]
+        },
+        getTemplate(timings) {
+             return [ 
+                { name: "Warm Up!", timing: timings.warmUp }, 
+                { name: "Presentation", timing: timings.presentation }, 
+                { name: "Practice", timing: timings.practice }, 
+                { name: "Practice", timing: timings.practice }, 
+                { name: "Production", timing: timings.production }, 
+                { name: "Break", timing: timings.break }, 
+                { name: "Practice", timing: 25 }, // The one after break is longer as requested
+                { name: "Production", timing: timings.production }, 
+                { name: "Wrap Up!", timing: timings.wrapUp } 
+            ];
         },
         cacheElements() {
             this.elements = {
                 mainContainer: document.querySelector('.main-container'),
                 teacher: document.getElementById('teacher'),
                 lessonTopic: document.getElementById('lessonTopic'), 
+                lessonAim: document.getElementById('lessonAim'),
                 studentInterests: document.getElementById('studentInterests'),
                 date: document.getElementById('date'),
                 class: document.getElementById('class'),
@@ -512,23 +529,11 @@ document.addEventListener('DOMContentLoaded', () => {
                  });
             }
         },
-        getTemplate(timings) {
-             return [ 
-                { name: "Warm Up!", timing: timings.warmUp }, 
-                { name: "Presentation", timing: timings.presentation }, 
-                { name: "Practice", timing: timings.practice }, 
-                { name: "Practice", timing: timings.practice }, 
-                { name: "Production", timing: timings.production }, 
-                { name: "Break", timing: timings.break }, 
-                { name: "Practice", timing: timings.practice }, 
-                { name: "Production", timing: timings.production }, 
-                { name: "Wrap Up!", timing: timings.wrapUp } 
-            ];
-        },
         renderAll() {
             const state = AppState.data;
             this.elements.teacher.textContent = state.teacher || ''; 
             this.elements.lessonTopic.textContent = state.lessonTopic || '';
+            this.elements.lessonAim.textContent = state.lessonAim || '';
             this.elements.studentInterests.textContent = state.studentInterests || '';
             this.elements.class.textContent = state.class || '';
             this.elements.numStudents.textContent = state.numStudents || '';
@@ -702,24 +707,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 - Level/Book: ${levelDetail}
                 - Student Interests: ${studentInterests || 'not specified'}
 
-                Generate a JSON array of 9 stage objects. Each object must have "name", "timing", "aim", "activity", "focus", and "material" properties.
-                The "activity" description MUST be in the third person (e.g., "The teacher will show...").
+                Generate a single JSON object with two properties: "lessonAim" (a string) and "stages" (an array of 9 stage objects).
+                The "lessonAim" should be a concise purpose for the entire lesson.
+                Each object in the "stages" array must have "name", "timing", "aim", "activity", "focus", and "material" properties.
+                The "activity" description MUST be in the third person (e.g., "The teacher will show..."). 
+                Production activities should be student-centered, with the teacher acting as a facilitator.
                 For the "focus" property, use only standard interaction patterns like "T-S" (Teacher-to-Student), "S-S" (Student-to-Student), or "S-T" (Student-to-Teacher).
-                The total time must be exactly 150 minutes, following this specific structure and strict timings:
+                
+                The total time must be exactly 150 minutes, following this specific structure and STRICT timings:
                 - Warm Up: 7 minutes
                 - Presentation: 25 minutes
-                - Practice: 15 minutes
-                - Practice: 15 minutes
-                - Production: 20 minutes
+                - Practice 1: 15 minutes
+                - Practice 2: 15 minutes
+                - Production 1: 20 minutes
                 - Break: 15 minutes
-                - Practice: 25 minutes, but this one MUST BE DIVIDED INTO TWO OR MORE SMALLER ACTIVITIES, and the total time for this stage must not exceed 25 minutes. One of the activities must not exceed 15 minutes.
-                - Production: 20 minutes
+                - Practice 3: 25 minutes
+                - Production 2: 20 minutes
                 - Wrap Up: 8 minutes
                 
-                Ensure each "Practice" stage does not exceed 15 minutes, except for the one after the break that can go up to 25 minutes.
-                Ensure each "Production" stage does not exceed 20 minutes.
-                Ensure the "Break" is exactly 15 minutes.
-                Ensure "Warm Up" is 7 minutes and "Wrap Up" is 5 minutes.
+                Ensure "Practice" stages do not exceed their allotted time. The third practice can be longer.
+                Ensure "Production" stages do not exceed 20 minutes.
                 Create unique and engaging activities for each stage that are highly specific to the provided context. Do not use generic placeholders.
             `;
             
@@ -731,19 +738,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     generationConfig: {
                         responseMimeType: "application/json",
                         responseSchema: {
-                            type: "ARRAY",
-                            items: {
-                                type: "OBJECT",
-                                properties: {
-                                    "name": { "type": "STRING" },
-                                    "timing": { "type": "INTEGER" },
-                                    "aim": { "type": "STRING" },
-                                    "activity": { "type": "STRING" },
-                                    "focus": { "type": "STRING" },
-                                    "material": { "type": "STRING" },
-                                },
-                                required: ["name", "timing", "aim", "activity", "focus", "material"]
-                            }
+                            type: "OBJECT",
+                            properties: {
+                                "lessonAim": { "type": "STRING" },
+                                "stages": {
+                                    type: "ARRAY",
+                                    items: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            "name": { "type": "STRING" },
+                                            "timing": { "type": "INTEGER" },
+                                            "aim": { "type": "STRING" },
+                                            "activity": { "type": "STRING" },
+                                            "focus": { "type": "STRING" },
+                                            "material": { "type": "STRING" },
+                                        },
+                                        required: ["name", "timing", "aim", "activity", "focus", "material"]
+                                    }
+                                }
+                            },
+                            required: ["lessonAim", "stages"]
                         }
                     }
                 };
@@ -765,8 +779,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
 
                 if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0].text) {
-                    const generatedStages = JSON.parse(result.candidates[0].content.parts[0].text);
-                    AppState.data.stages = generatedStages.map(s => ({ ...s, id: crypto.randomUUID() }));
+                    const generatedData = JSON.parse(result.candidates[0].content.parts[0].text);
+                    AppState.data.lessonAim = generatedData.lessonAim;
+                    AppState.data.stages = generatedData.stages.map(s => ({ ...s, id: crypto.randomUUID() }));
                     UIModule.renderAll();
                     UIModule.displayMessage('AI has successfully generated your lesson plan!', 'success');
                 } else {
@@ -834,7 +849,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 doc.text(`Level: ${state.levelCourseType || 'N/A'} - ${state.levelDetail || 'N/A'}`, col1X, currentY);
                 doc.text(`Number of students: ${state.numStudents || 'N/A'}`, col2X, currentY);
                 currentY += 6;
-                const aimText = `Aim of the Lesson: ${state.lessonTopic || 'N/A'}`;
+                const aimText = `Aim of the Lesson: ${state.lessonAim || state.lessonTopic || 'N/A'}`;
                 doc.text(doc.splitTextToSize(aimText, 260), col1X, currentY);
                 currentY += 10;
                 const objectiveText = `Objective: At the end of the class, students should be able to effectively talk about ${state.lessonTopic || 'the lesson topic'}.`;
